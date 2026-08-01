@@ -17,257 +17,7 @@ st.set_page_config(
     page_icon="🤖",
     layout="wide",
 )
-st.markdown(
-    """
-    <style>
-    /* Hide Streamlit default chrome */
-    #MainMenu,
-    footer,
-    header {
-        visibility: hidden;
-    }
 
-    :root {
-        color-scheme: light;
-    }
-
-    html,
-    body,
-    [data-testid="stAppViewContainer"],
-    .stApp {
-        background: linear-gradient(
-            135deg,
-            #f8fafc 0%,
-            #eef2ff 100%
-        ) !important;
-        color: #172033 !important;
-    }
-
-    .block-container {
-        max-width: 1250px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
-
-    /* Header */
-    .main-title {
-        font-size: 42px;
-        font-weight: 800;
-        color: #1e3a8a !important;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-
-    .sub-title {
-        text-align: center;
-        color: #64748b !important;
-        font-size: 17px;
-        line-height: 1.7;
-        margin-bottom: 10px;
-    }
-
-    .tech-line {
-        text-align: center;
-        color: #475569 !important;
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 30px;
-    }
-
-    /* Main-page text: force readable dark text on light background */
-    [data-testid="stMainBlockContainer"],
-    [data-testid="stMainBlockContainer"] p,
-    [data-testid="stMainBlockContainer"] li,
-    [data-testid="stMainBlockContainer"] label,
-    [data-testid="stMainBlockContainer"] span:not(button span),
-    [data-testid="stMarkdownContainer"],
-    [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMarkdownContainer"] li,
-    [data-testid="stMarkdownContainer"] strong,
-    [data-testid="stMarkdownContainer"] em,
-    [data-testid="stMarkdownContainer"] code {
-        color: #172033 !important;
-    }
-
-    [data-testid="stMarkdownContainer"] h1,
-    [data-testid="stMarkdownContainer"] h2,
-    [data-testid="stMarkdownContainer"] h3,
-    [data-testid="stMarkdownContainer"] h4,
-    [data-testid="stMarkdownContainer"] h5,
-    [data-testid="stMarkdownContainer"] h6,
-    .block-container h1,
-    .block-container h2,
-    .block-container h3 {
-        color: #102a56 !important;
-    }
-
-    [data-testid="stMarkdownContainer"] a {
-        color: #2563eb !important;
-    }
-
-    [data-testid="stMarkdownContainer"] blockquote {
-        color: #334155 !important;
-        border-left-color: #64748b !important;
-    }
-
-    /* Sidebar */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(
-            180deg,
-            #111827 0%,
-            #172033 100%
-        ) !important;
-        border-right: 1px solid #243047;
-    }
-
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] li,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] * {
-        color: #f8fafc !important;
-    }
-
-    /* Buttons */
-    .stButton > button {
-        width: 100%;
-        min-height: 48px;
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(90deg, #2563eb, #4f46e5);
-        color: #ffffff !important;
-        font-size: 15px;
-        font-weight: 650;
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
-        transition: all 0.25s ease;
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 22px rgba(37, 99, 235, 0.30);
-    }
-
-    .stButton > button *,
-    .stDownloadButton > button * {
-        color: #ffffff !important;
-    }
-
-    .stDownloadButton > button {
-        width: 100%;
-        min-height: 46px;
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(90deg, #0f766e, #0891b2);
-        color: #ffffff !important;
-        font-weight: 650;
-    }
-
-    /* Metric cards */
-    div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 20px;
-        min-height: 130px;
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
-        transition: all 0.25s ease;
-    }
-
-    div[data-testid="stMetric"]:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
-    }
-
-    div[data-testid="stMetric"] label,
-    div[data-testid="stMetric"] label * {
-        color: #475569 !important;
-        font-weight: 650;
-    }
-
-    div[data-testid="stMetricValue"],
-    div[data-testid="stMetricValue"] * {
-        color: #0f172a !important;
-        font-weight: 800;
-    }
-
-    /* Inputs */
-    div[data-baseweb="input"] > div,
-    div[data-baseweb="textarea"] {
-        border-radius: 12px;
-        border-color: #cbd5e1;
-        background: #ffffff !important;
-    }
-
-    input,
-    textarea {
-        color: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-        color: #64748b !important;
-        opacity: 1 !important;
-    }
-
-    /* File uploader */
-    section[data-testid="stFileUploader"] {
-        background: rgba(15, 23, 42, 0.30);
-        border-radius: 14px;
-        padding: 8px;
-    }
-
-    /* Expanders and chat messages */
-    details,
-    div[data-testid="stChatMessage"] {
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-    }
-
-    details {
-        padding: 5px;
-    }
-
-    div[data-testid="stChatMessage"] {
-        padding: 8px;
-        margin-bottom: 12px;
-    }
-
-    details *,
-    div[data-testid="stChatMessage"] * {
-        color: #172033 !important;
-    }
-
-    /* Alerts */
-    div[data-testid="stAlert"] {
-        border-radius: 12px;
-    }
-
-    /* Horizontal separators */
-    hr {
-        border-color: #cbd5e1 !important;
-    }
-
-    /* Footer */
-    .custom-footer {
-        text-align: center;
-        color: #64748b !important;
-        font-size: 14px;
-        padding-top: 25px;
-        padding-bottom: 15px;
-    }
-
-    .custom-footer b {
-        color: #334155 !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # ==================================================
 # Session State Initialization
@@ -279,7 +29,6 @@ default_session_values = {
     "chat_history": [],
     "pdf_summary": "",
     "study_notes": "",
-    "questions_asked": 0,
 }
 
 
@@ -302,7 +51,6 @@ def clear_application_data() -> None:
     st.session_state.chat_history = []
     st.session_state.pdf_summary = ""
     st.session_state.study_notes = ""
-    st.session_state.questions_asked = 0
 
 
 # ==================================================
@@ -338,23 +86,16 @@ with st.sidebar:
 # ==================================================
 # Main Heading
 # ==================================================
-st.markdown(
-    """
-    <div class="main-title">
-        🤖 AI PDF Assistant
-    </div>
+st.title("🤖 AI PDF Assistant")
 
-    <div class="sub-title">
-        Upload PDF documents and use AI for question answering,
-        intelligent summarization, and structured study notes.
-    </div>
-
-    <div class="tech-line">
-        Powered by Gemini AI • FAISS • RAG • Sentence Transformers
-    </div>
-    """,
-    unsafe_allow_html=True,
+st.write(
+    "Upload PDF documents and use AI for question answering, "
+    "summarization, and study notes."
 )
+
+st.markdown("---")
+
+
 # ==================================================
 # PDF Processing
 # ==================================================
@@ -495,159 +236,110 @@ if documents_are_ready:
             height=220,
             disabled=True,
         )
-st.markdown("---")
-
-st.subheader("📊 Dashboard")
-
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.metric(
-        "📄 PDFs",
-        len(uploaded_files)
-    )
-
-with col2:
-    st.metric(
-        "📑 Chunks",
-        len(st.session_state.all_chunks)
-    )
-
-with col3:
-    st.metric(
-        "🧠 Embeddings",
-        (
-            st.session_state.faiss_index.ntotal
-            if st.session_state.faiss_index is not None
-            else 0
-        ),
-    )
-
-with col4:
-    st.metric(
-        "💬 Questions",
-        st.session_state.questions_asked
-    )
 
 
-# ==================================================
-# PDF Summary Generator
-# ==================================================
-st.markdown("---")
+    # ==================================================
+    # PDF Summary Generator
+    # ==================================================
+    st.markdown("---")
 
-st.subheader("📝 PDF Summary")
+    st.subheader("📝 PDF Summary")
 
-if st.button(
-    "✨ Generate PDF Summary",
-    use_container_width=True,
-    disabled=not documents_are_ready,
-):
-    try:
-        with st.spinner(
-            "Generating a detailed PDF summary..."
-        ):
-            from helpers.summary_generator import (
-                generate_pdf_summary,
+    if st.button(
+        "✨ Generate PDF Summary",
+        use_container_width=True,
+    ):
+        try:
+            with st.spinner(
+                "Generating a detailed PDF summary..."
+            ):
+                from helpers.summary_generator import (
+                    generate_pdf_summary,
+                )
+
+                complete_document_text = "\n\n".join(
+                    st.session_state.all_chunks
+                )
+
+                generated_summary = generate_pdf_summary(
+                    complete_document_text
+                )
+
+                st.session_state.pdf_summary = generated_summary
+
+        except Exception as error:
+            st.error(
+                "An error occurred while generating the PDF summary: "
+                f"{error}"
             )
 
-            complete_document_text = "\n\n".join(
-                st.session_state.all_chunks
-            )
+    if st.session_state.pdf_summary:
+        st.markdown("### 📄 Generated Summary")
 
-            generated_summary = generate_pdf_summary(
-                complete_document_text
-            )
-
-            st.session_state.pdf_summary = generated_summary
-
-    except Exception as error:
-        st.error(
-            "An error occurred while generating the PDF summary: "
-            f"{error}"
+        st.markdown(
+            st.session_state.pdf_summary
         )
 
-if st.session_state.pdf_summary:
-    st.markdown("### 📄 Generated Summary")
-
-    st.markdown(
-        st.session_state.pdf_summary
-    )
-
-    from helpers.pdf_exporter import create_pdf
-
-    summary_pdf = create_pdf(
-        "PDF Summary",
-        st.session_state.pdf_summary,
-    )
-
-    st.download_button(
-        label="📥 Download Summary as PDF",
-        data=summary_pdf,
-        file_name="PDF_Summary.pdf",
-        mime="application/pdf",
-        use_container_width=True,
-        key="download_summary_pdf",
-    )
-
-
-# ==================================================
-# Study Notes Generator
-# ==================================================
-st.markdown("---")
-
-st.subheader("📚 AI Study Notes")
-
-if st.button(
-    "📝 Generate Study Notes",
-    use_container_width=True,
-    disabled=not documents_are_ready,
-):
-    try:
-        with st.spinner(
-            "Generating structured study notes..."
-        ):
-            from helpers.notes_generator import (
-                generate_study_notes,
-            )
-
-            complete_document_text = "\n\n".join(
-                st.session_state.all_chunks
-            )
-
-            generated_notes = generate_study_notes(
-                complete_document_text
-            )
-
-            st.session_state.study_notes = generated_notes
-
-    except Exception as error:
-        st.error(
-            "An error occurred while generating study notes: "
-            f"{error}"
+        st.download_button(
+            label="⬇️ Download Summary",
+            data=st.session_state.pdf_summary,
+            file_name="pdf_summary.txt",
+            mime="text/plain",
+            use_container_width=True,
+            key="download_summary_button",
         )
 
-if st.session_state.study_notes:
-    st.markdown("### 📝 Generated Study Notes")
 
-    st.markdown(
-        st.session_state.study_notes
-    )
+    # ==================================================
+    # Study Notes Generator
+    # ==================================================
+    st.markdown("---")
 
-    from helpers.pdf_exporter import create_pdf
+    st.subheader("📚 AI Study Notes")
 
-    study_notes_pdf = create_pdf(
-        "Study Notes",
-        st.session_state.study_notes,
-    )
-
-    st.download_button(
-        label="📥 Download Study Notes as PDF",
-        data=study_notes_pdf,
-        file_name="Study_Notes.pdf",
-        mime="application/pdf",
+    if st.button(
+        "📝 Generate Study Notes",
         use_container_width=True,
-        key="download_notes_pdf",
-    )
+    ):
+        try:
+            with st.spinner(
+                "Generating structured study notes..."
+            ):
+                from helpers.notes_generator import (
+                    generate_study_notes,
+                )
+
+                complete_document_text = "\n\n".join(
+                    st.session_state.all_chunks
+                )
+
+                generated_notes = generate_study_notes(
+                    complete_document_text
+                )
+
+                st.session_state.study_notes = generated_notes
+
+        except Exception as error:
+            st.error(
+                "An error occurred while generating study notes: "
+                f"{error}"
+            )
+
+    if st.session_state.study_notes:
+        st.markdown("### 📝 Generated Study Notes")
+
+        st.markdown(
+            st.session_state.study_notes
+        )
+
+        st.download_button(
+            label="⬇️ Download Study Notes",
+            data=st.session_state.study_notes,
+            file_name="study_notes.txt",
+            mime="text/plain",
+            use_container_width=True,
+            key="download_notes_button",
+        )
 
 
 # ==================================================
@@ -725,7 +417,7 @@ if st.button(
                         question=question,
                         context=retrieved_context,
                     )
-                    st.session_state.questions_asked += 1
+
                     st.session_state.chat_history.append(
                         {
                             "question": question,
@@ -808,17 +500,3 @@ if st.session_state.chat_history:
                         )
 
                         st.markdown("---")
-                        st.markdown("---")
-
-st.markdown("---")
-
-st.markdown(
-    """
-    <div class="custom-footer">
-        © 2026 AI PDF Assistant<br>
-        Built with <b>Python</b> • <b>Streamlit</b> •
-        <b>FAISS</b> • <b>Gemini AI</b>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
