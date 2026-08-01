@@ -24,3 +24,4 @@ Thumbs.db
 # Generated files
 *.pdf
 *.txt
+!requirements.txt
