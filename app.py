@@ -20,41 +20,47 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Hide Streamlit default elements */
+    /* Hide Streamlit default chrome */
     #MainMenu,
     footer,
     header {
         visibility: hidden;
     }
 
-    /* Main app background */
+    :root {
+        color-scheme: light;
+    }
+
+    html,
+    body,
+    [data-testid="stAppViewContainer"],
     .stApp {
         background: linear-gradient(
             135deg,
             #f8fafc 0%,
             #eef2ff 100%
-        );
+        ) !important;
+        color: #172033 !important;
     }
 
-    /* Main content width and spacing */
     .block-container {
         max-width: 1250px;
         padding-top: 2rem;
         padding-bottom: 3rem;
     }
 
-    /* Custom header */
+    /* Header */
     .main-title {
         font-size: 42px;
         font-weight: 800;
-        color: #1e3a8a;
+        color: #1e3a8a !important;
         text-align: center;
         margin-bottom: 8px;
     }
 
     .sub-title {
         text-align: center;
-        color: #64748b;
+        color: #64748b !important;
         font-size: 17px;
         line-height: 1.7;
         margin-bottom: 10px;
@@ -62,10 +68,46 @@ st.markdown(
 
     .tech-line {
         text-align: center;
-        color: #475569;
+        color: #475569 !important;
         font-size: 14px;
         font-weight: 600;
         margin-bottom: 30px;
+    }
+
+    /* Main-page text: force readable dark text on light background */
+    [data-testid="stMainBlockContainer"],
+    [data-testid="stMainBlockContainer"] p,
+    [data-testid="stMainBlockContainer"] li,
+    [data-testid="stMainBlockContainer"] label,
+    [data-testid="stMainBlockContainer"] span:not(button span),
+    [data-testid="stMarkdownContainer"],
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] strong,
+    [data-testid="stMarkdownContainer"] em,
+    [data-testid="stMarkdownContainer"] code {
+        color: #172033 !important;
+    }
+
+    [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stMarkdownContainer"] h3,
+    [data-testid="stMarkdownContainer"] h4,
+    [data-testid="stMarkdownContainer"] h5,
+    [data-testid="stMarkdownContainer"] h6,
+    .block-container h1,
+    .block-container h2,
+    .block-container h3 {
+        color: #102a56 !important;
+    }
+
+    [data-testid="stMarkdownContainer"] a {
+        color: #2563eb !important;
+    }
+
+    [data-testid="stMarkdownContainer"] blockquote {
+        color: #334155 !important;
+        border-left-color: #64748b !important;
     }
 
     /* Sidebar */
@@ -74,7 +116,7 @@ st.markdown(
             180deg,
             #111827 0%,
             #172033 100%
-        );
+        ) !important;
         border-right: 1px solid #243047;
     }
 
@@ -82,23 +124,11 @@ st.markdown(
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3,
     section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] li,
     section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] span {
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] * {
         color: #f8fafc !important;
-    }
-
-    /* Main headings */
-    .block-container h1,
-    .block-container h2,
-    .block-container h3 {
-        color: #172554;
-    }
-
-    /* Normal text */
-    .block-container p,
-    .block-container label,
-    .block-container span {
-        color: #1f2937;
     }
 
     /* Buttons */
@@ -107,12 +137,8 @@ st.markdown(
         min-height: 48px;
         border-radius: 12px;
         border: none;
-        background: linear-gradient(
-            90deg,
-            #2563eb,
-            #4f46e5
-        );
-        color: white !important;
+        background: linear-gradient(90deg, #2563eb, #4f46e5);
+        color: #ffffff !important;
         font-size: 15px;
         font-weight: 650;
         box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
@@ -124,32 +150,24 @@ st.markdown(
         box-shadow: 0 10px 22px rgba(37, 99, 235, 0.30);
     }
 
-    .stButton > button p {
-        color: white !important;
+    .stButton > button *,
+    .stDownloadButton > button * {
+        color: #ffffff !important;
     }
 
-    /* Download buttons */
     .stDownloadButton > button {
         width: 100%;
         min-height: 46px;
         border-radius: 12px;
         border: none;
-        background: linear-gradient(
-            90deg,
-            #0f766e,
-            #0891b2
-        );
-        color: white !important;
+        background: linear-gradient(90deg, #0f766e, #0891b2);
+        color: #ffffff !important;
         font-weight: 650;
-    }
-
-    .stDownloadButton > button p {
-        color: white !important;
     }
 
     /* Metric cards */
     div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.96);
         border: 1px solid #e2e8f0;
         border-radius: 16px;
         padding: 20px;
@@ -163,49 +181,65 @@ st.markdown(
         box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
     }
 
-    div[data-testid="stMetric"] label {
+    div[data-testid="stMetric"] label,
+    div[data-testid="stMetric"] label * {
         color: #475569 !important;
         font-weight: 650;
     }
 
-    div[data-testid="stMetricValue"] {
+    div[data-testid="stMetricValue"],
+    div[data-testid="stMetricValue"] * {
         color: #0f172a !important;
         font-weight: 800;
     }
 
+    /* Inputs */
+    div[data-baseweb="input"] > div,
+    div[data-baseweb="textarea"] {
+        border-radius: 12px;
+        border-color: #cbd5e1;
+        background: #ffffff !important;
+    }
+
+    input,
+    textarea {
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+
     /* File uploader */
     section[data-testid="stFileUploader"] {
-        background: rgba(15, 23, 42, 0.3);
+        background: rgba(15, 23, 42, 0.30);
         border-radius: 14px;
         padding: 8px;
     }
 
-    /* Expander */
-    details {
-        background: rgba(255, 255, 255, 0.92);
+    /* Expanders and chat messages */
+    details,
+    div[data-testid="stChatMessage"] {
+        background: rgba(255, 255, 255, 0.96);
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 14px;
+    }
+
+    details {
         padding: 5px;
     }
 
-    /* Inputs */
-    div[data-baseweb="input"] > div {
-        border-radius: 12px;
-        border-color: #cbd5e1;
-        background: white;
-    }
-
-    input {
-        color: #111827 !important;
-    }
-
-    /* Chat messages */
     div[data-testid="stChatMessage"] {
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
         padding: 8px;
         margin-bottom: 12px;
+    }
+
+    details *,
+    div[data-testid="stChatMessage"] * {
+        color: #172033 !important;
     }
 
     /* Alerts */
@@ -213,17 +247,22 @@ st.markdown(
         border-radius: 12px;
     }
 
+    /* Horizontal separators */
+    hr {
+        border-color: #cbd5e1 !important;
+    }
+
     /* Footer */
     .custom-footer {
         text-align: center;
-        color: #64748b;
+        color: #64748b !important;
         font-size: 14px;
         padding-top: 25px;
         padding-bottom: 15px;
     }
 
     .custom-footer b {
-        color: #334155;
+        color: #334155 !important;
     }
     </style>
     """,
@@ -501,6 +540,7 @@ st.subheader("📝 PDF Summary")
 if st.button(
     "✨ Generate PDF Summary",
     use_container_width=True,
+    disabled=not documents_are_ready,
 ):
     try:
         with st.spinner(
@@ -560,6 +600,7 @@ st.subheader("📚 AI Study Notes")
 if st.button(
     "📝 Generate Study Notes",
     use_container_width=True,
+    disabled=not documents_are_ready,
 ):
     try:
         with st.spinner(
@@ -590,15 +631,6 @@ if st.session_state.study_notes:
 
     st.markdown(
         st.session_state.study_notes
-    )
-
-    st.download_button(
-        label="⬇️ Download Study Notes",
-        data=st.session_state.study_notes,
-        file_name="study_notes.txt",
-        mime="text/plain",
-        use_container_width=True,
-        key="download_notes_button",
     )
 
     from helpers.pdf_exporter import create_pdf
@@ -778,18 +810,6 @@ if st.session_state.chat_history:
                         st.markdown("---")
                         st.markdown("---")
 
-st.markdown(
-"""
-<div style="text-align:center;color:gray;">
-
-Made with ❤️ using
-
-<b>Python</b> • <b>Streamlit</b> • <b>FAISS</b> • <b>Gemini AI</b>
-
-</div>
-""",
-unsafe_allow_html=True
-)
 st.markdown("---")
 
 st.markdown(
