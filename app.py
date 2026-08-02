@@ -319,6 +319,150 @@ st.markdown(
         color: #334155 !important;
     }
 
+    /* ==================================================
+       FINAL READABILITY FIXES
+       Keep the light theme, but force every main-content text
+       element to use a clearly visible dark colour.
+       ================================================== */
+
+    /* General text inside the main content area */
+    [data-testid="stAppViewContainer"] .main p,
+    [data-testid="stAppViewContainer"] .main li,
+    [data-testid="stAppViewContainer"] .main label,
+    [data-testid="stAppViewContainer"] .main small,
+    [data-testid="stAppViewContainer"] .main code,
+    [data-testid="stAppViewContainer"] .main pre,
+    [data-testid="stAppViewContainer"] .main td,
+    [data-testid="stAppViewContainer"] .main th {
+        color: #111827 !important;
+        opacity: 1 !important;
+    }
+
+    /* Streamlit Markdown generated from summaries, notes and answers */
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"],
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] p,
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] li,
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] span,
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] strong,
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] em {
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h3,
+    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h4 {
+        color: #172554 !important;
+        -webkit-text-fill-color: #172554 !important;
+        opacity: 1 !important;
+    }
+
+    /* Question input: white field and dark typed text */
+    [data-testid="stAppViewContainer"] .main div[data-baseweb="input"] > div {
+        background-color: #ffffff !important;
+        border: 1px solid #94a3b8 !important;
+    }
+
+    [data-testid="stAppViewContainer"] .main div[data-baseweb="input"] input {
+        background-color: #ffffff !important;
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+        caret-color: #2563eb !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stAppViewContainer"] .main div[data-baseweb="input"] input::placeholder {
+        color: #64748b !important;
+        -webkit-text-fill-color: #64748b !important;
+        opacity: 1 !important;
+    }
+
+    /* Extracted chunk preview / all text areas, including disabled ones */
+    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] textarea,
+    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] textarea:disabled,
+    [data-testid="stAppViewContainer"] .main textarea,
+    [data-testid="stAppViewContainer"] .main textarea:disabled {
+        background-color: #ffffff !important;
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+        opacity: 1 !important;
+        border-color: #94a3b8 !important;
+    }
+
+    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] label,
+    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] label p {
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+        opacity: 1 !important;
+    }
+
+    /* Expanders: dark title and dark content */
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary,
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary p,
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary span,
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary svg,
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] div,
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] p,
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] span,
+    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] li {
+        color: #111827 !important;
+        fill: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+        opacity: 1 !important;
+    }
+
+    /* Alert messages */
+    [data-testid="stAppViewContainer"] .main [data-testid="stAlert"] p,
+    [data-testid="stAppViewContainer"] .main [data-testid="stAlert"] div,
+    [data-testid="stAppViewContainer"] .main [data-testid="stAlert"] span {
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+        opacity: 1 !important;
+    }
+
+    /* Chat cards */
+    [data-testid="stAppViewContainer"] .main [data-testid="stChatMessage"] p,
+    [data-testid="stAppViewContainer"] .main [data-testid="stChatMessage"] li,
+    [data-testid="stAppViewContainer"] .main [data-testid="stChatMessage"] span {
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
+        opacity: 1 !important;
+    }
+
+    /* Metric labels and values */
+    [data-testid="stAppViewContainer"] .main [data-testid="stMetricLabel"] p {
+        color: #475569 !important;
+        -webkit-text-fill-color: #475569 !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stAppViewContainer"] .main [data-testid="stMetricValue"] {
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+        opacity: 1 !important;
+    }
+
+    /* Preserve intentional white text on coloured controls */
+    .hero-card .hero-title,
+    .hero-card .hero-subtitle,
+    .hero-card .hero-tech,
+    .stButton > button,
+    .stButton > button p,
+    .stButton > button span,
+    .stDownloadButton > button,
+    .stDownloadButton > button p,
+    .stDownloadButton > button span {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .block-container {
