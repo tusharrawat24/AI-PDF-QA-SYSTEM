@@ -18,25 +18,44 @@ st.set_page_config(
 
 
 # ==================================================
+# User Theme Selection
+# ==================================================
+with st.sidebar:
+    st.markdown(
+        """
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-title">🧠 NeuraDocs</div>
+            <div class="sidebar-brand-subtitle">
+                AI PDF Study Assistant • Version 1.0
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    selected_theme = st.radio(
+        "🎨 App Theme",
+        options=["Light", "Dark"],
+        horizontal=True,
+        key="neuradocs_theme_selector",
+        help="Change the appearance without editing the code.",
+    )
+
+
+# ==================================================
 # Professional UI Theme
 # ==================================================
 st.markdown(
     """
     <style>
-    /* Hide Streamlit menu and footer only */
-#MainMenu {
-    visibility: hidden;
-}
+    /* Hide only Streamlit menu and footer. Keep header for sidebar control. */
+    #MainMenu, footer {
+        visibility: hidden;
+    }
 
-footer {
-    visibility: hidden;
-}
-
-/* Keep the header visible */
-header {
-    visibility: visible !important;
-    background: transparent !important;
-}
+    header[data-testid="stHeader"] {
+        visibility: visible !important;
+        background: transparent !important;
     }
 
     /* App background */
@@ -536,6 +555,189 @@ header {
 
 
 # ==================================================
+# Dynamic Theme Overrides
+# ==================================================
+if selected_theme == "Dark":
+    theme_values = {
+        "app_bg": "linear-gradient(135deg, #070b14 0%, #0f172a 55%, #111827 100%)",
+        "main_text": "#e5e7eb",
+        "muted_text": "#cbd5e1",
+        "heading": "#f8fafc",
+        "card_bg": "#111827",
+        "card_border": "#334155",
+        "input_bg": "#0f172a",
+        "input_text": "#f8fafc",
+        "code_bg": "#020617",
+        "code_text": "#f8fafc",
+        "alert_text": "#f8fafc",
+        "divider": "#334155",
+    }
+else:
+    theme_values = {
+        "app_bg": "linear-gradient(135deg, #f8fafc 0%, #eef2ff 55%, #f8fafc 100%)",
+        "main_text": "#111827",
+        "muted_text": "#475569",
+        "heading": "#172554",
+        "card_bg": "#ffffff",
+        "card_border": "#dbeafe",
+        "input_bg": "#ffffff",
+        "input_text": "#111827",
+        "code_bg": "#111827",
+        "code_text": "#f8fafc",
+        "alert_text": "#111827",
+        "divider": "#cbd5e1",
+    }
+
+st.markdown(
+    f"""
+    <style>
+    /* Theme Manager overrides */
+    html, body, .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"],
+    .main {{
+        background: {theme_values['app_bg']} !important;
+        color: {theme_values['main_text']} !important;
+    }}
+
+    header[data-testid="stHeader"] {{
+        visibility: visible !important;
+        background: transparent !important;
+    }}
+
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="collapsedControl"] {{
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 999999 !important;
+    }}
+
+    /* Main text */
+    [data-testid="stAppViewContainer"] .main p,
+    [data-testid="stAppViewContainer"] .main li,
+    [data-testid="stAppViewContainer"] .main label,
+    [data-testid="stAppViewContainer"] .main span,
+    [data-testid="stAppViewContainer"] .main small,
+    [data-testid="stAppViewContainer"] .main div[data-testid="stMarkdownContainer"] {{
+        color: {theme_values['main_text']} !important;
+        -webkit-text-fill-color: {theme_values['main_text']} !important;
+        opacity: 1 !important;
+    }}
+
+    [data-testid="stAppViewContainer"] .main h1,
+    [data-testid="stAppViewContainer"] .main h2,
+    [data-testid="stAppViewContainer"] .main h3,
+    [data-testid="stAppViewContainer"] .main h4 {{
+        color: {theme_values['heading']} !important;
+        -webkit-text-fill-color: {theme_values['heading']} !important;
+    }}
+
+    /* Cards, metrics, expanders and chat */
+    .welcome-card,
+    div[data-testid="stMetric"],
+    details[data-testid="stExpander"],
+    div[data-testid="stChatMessage"] {{
+        background: {theme_values['card_bg']} !important;
+        border-color: {theme_values['card_border']} !important;
+    }}
+
+    .welcome-card h3,
+    .welcome-card p,
+    .welcome-card li,
+    div[data-testid="stMetric"] label,
+    div[data-testid="stMetricValue"],
+    details[data-testid="stExpander"] summary,
+    details[data-testid="stExpander"] summary *,
+    details[data-testid="stExpander"] div,
+    details[data-testid="stExpander"] p,
+    details[data-testid="stExpander"] span,
+    details[data-testid="stExpander"] li,
+    div[data-testid="stChatMessage"] p,
+    div[data-testid="stChatMessage"] span,
+    div[data-testid="stChatMessage"] li {{
+        color: {theme_values['main_text']} !important;
+        -webkit-text-fill-color: {theme_values['main_text']} !important;
+        opacity: 1 !important;
+    }}
+
+    /* Inputs and text areas */
+    div[data-baseweb="input"] > div,
+    div[data-baseweb="input"] input,
+    div[data-testid="stTextArea"] textarea,
+    div[data-testid="stTextArea"] textarea:disabled {{
+        background: {theme_values['input_bg']} !important;
+        color: {theme_values['input_text']} !important;
+        -webkit-text-fill-color: {theme_values['input_text']} !important;
+        opacity: 1 !important;
+        border-color: {theme_values['card_border']} !important;
+    }}
+
+    div[data-baseweb="input"] input::placeholder {{
+        color: {theme_values['muted_text']} !important;
+        -webkit-text-fill-color: {theme_values['muted_text']} !important;
+        opacity: 1 !important;
+    }}
+
+    /* Alerts */
+    div[data-testid="stAlert"] p,
+    div[data-testid="stAlert"] span,
+    div[data-testid="stAlert"] div {{
+        color: {theme_values['alert_text']} !important;
+        -webkit-text-fill-color: {theme_values['alert_text']} !important;
+    }}
+
+    /* Code / architecture blocks */
+    .block-container pre,
+    .block-container pre code,
+    .block-container [data-testid="stCodeBlock"],
+    .block-container [data-testid="stCodeBlock"] code,
+    .block-container [data-testid="stCodeBlock"] span {{
+        background: {theme_values['code_bg']} !important;
+        color: {theme_values['code_text']} !important;
+        -webkit-text-fill-color: {theme_values['code_text']} !important;
+    }}
+
+    [data-testid="stAppViewContainer"] hr {{
+        border-color: {theme_values['divider']} !important;
+    }}
+
+    /* File uploader readability in the dark sidebar */
+    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] {{
+        background: #0b1220 !important;
+        border: 1px solid #334155 !important;
+    }}
+
+    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] button {{
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+    }}
+
+    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] button * {{
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+    }}
+
+    /* Preserve white text on hero and coloured buttons */
+    .hero-card .hero-title,
+    .hero-card .hero-subtitle,
+    .hero-card .hero-tech,
+    .stButton > button,
+    .stButton > button *,
+    .stDownloadButton > button,
+    .stDownloadButton > button * {{
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ==================================================
 # Session State Initialization
 # ==================================================
 def clone_default(value):
@@ -621,18 +823,6 @@ def build_complete_document_text() -> str:
 # Sidebar
 # ==================================================
 with st.sidebar:
-    st.markdown(
-        """
-        <div class="sidebar-brand">
-            <div class="sidebar-brand-title">🧠 NeuraDocs</div>
-            <div class="sidebar-brand-subtitle">
-                AI PDF Study Assistant • Version 1.0
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
     st.markdown("---")
 
     uploaded_files = st.file_uploader(
@@ -946,7 +1136,7 @@ st.markdown("---")
 st.subheader("💬 Ask a Question From Your PDFs")
 
 st.caption(
-    "Type your question below. NeuraDocs will retrieve the most relevant "
+    "Type your question below. NeuraDocs retrieves the most relevant "
     "content from your uploaded PDFs before generating the answer."
 )
 
