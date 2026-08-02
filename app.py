@@ -488,6 +488,36 @@ st.markdown(
             font-size: 12px;
         }
     }
+
+
+    /* Code blocks / architecture diagrams inside generated Markdown */
+    .block-container pre,
+    .block-container pre code,
+    .block-container [data-testid="stCodeBlock"],
+    .block-container [data-testid="stCodeBlock"] code,
+    .block-container [data-testid="stCodeBlock"] span {
+        background: #111827 !important;
+        color: #f8fafc !important;
+        -webkit-text-fill-color: #f8fafc !important;
+        opacity: 1 !important;
+    }
+
+    .block-container pre {
+        border: 1px solid #334155 !important;
+        border-radius: 14px !important;
+        padding: 18px !important;
+        overflow-x: auto !important;
+        line-height: 1.65 !important;
+    }
+
+    .block-container code:not(pre code) {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+        border-radius: 6px !important;
+        padding: 2px 6px !important;
+    }
+
     </style>
     """,
     unsafe_allow_html=True,
