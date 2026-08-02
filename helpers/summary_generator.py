@@ -1,46 +1,56 @@
-from helpers.gemini_client import client
+"""
+PDF summary generation using the shared AI layer.
+
+This module automatically uses:
+1. Google Gemini as the primary provider.
+2. Groq as the fallback provider when Gemini quota or service errors occur.
+"""
+
+from helpers.gemini_client import generate_content
 
 
 def generate_pdf_summary(document_text: str) -> str:
     """
-    Generate a detailed summary using the shared Gemini client.
+    Generate a detailed and well-structured summary of the PDF content.
     """
 
-    if not document_text or not document_text.strip():
+    if not isinstance(document_text, str) or not document_text.strip():
         raise ValueError("Document text cannot be empty.")
 
     prompt = f"""
-You are an expert document summarization assistant.
+You are NeuraDocs, an expert document summarization assistant.
 
-Generate a detailed and well-structured summary of the PDF content.
+Generate a detailed and well-structured summary using ONLY the PDF content
+provided below.
 
 Instructions:
-1. Include the main concepts and important details.
-2. Use clear headings and subheadings.
-3. Use bullet points where helpful.
-4. Do not introduce information outside the document.
-5. Keep the explanation easy to understand.
-6. Include a document overview and important revision points.
+1. Begin with a short document overview.
+2. Include all major concepts and important supporting details.
+3. Use clear headings and subheadings.
+4. Use bullet points where they improve readability.
+5. Keep the language simple and suitable for university students.
+6. Add a section titled "Important Revision Points".
+7. Do not introduce information that is not present in the PDF.
+8. Avoid unnecessary repetition.
 
 PDF Content:
 
 {document_text}
+
+Summary:
 """
 
     try:
-        response = client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=prompt,
-        )
+        summary_text = generate_content(prompt)
 
-        if not response.text:
+        if not summary_text or not summary_text.strip():
             raise RuntimeError(
-                "Gemini returned an empty summary."
+                "The AI provider returned an empty summary."
             )
 
-        return response.text.strip()
+        return summary_text.strip()
 
     except Exception as error:
         raise RuntimeError(
-            f"Gemini could not generate the PDF summary: {error}"
+            f"Unable to generate the PDF summary: {error}"
         ) from error
