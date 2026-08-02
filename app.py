@@ -33,12 +33,23 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    selected_theme = st.radio(
-        "🎨 App Theme",
+    st.markdown(
+        """
+        <div class="appearance-card">
+            <div class="appearance-title">⚙️ Appearance</div>
+            <div class="appearance-subtitle">Choose your preferred theme</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    selected_theme = st.selectbox(
+        "Choose app theme",
         options=["Light", "Dark"],
-        horizontal=True,
+        index=0,
         key="neuradocs_theme_selector",
-        help="Change the appearance without editing the code.",
+        label_visibility="collapsed",
+        help="Switch between Light and Dark mode.",
     )
 
 
@@ -139,6 +150,42 @@ st.markdown(
     .welcome-card p,
     .welcome-card li {
         color: #1f2937 !important;
+    }
+
+    /* Compact appearance selector */
+    .appearance-card {
+        margin: 14px 0 7px 0;
+        padding: 11px 13px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .appearance-title {
+        color: #f8fafc !important;
+        font-size: 14px;
+        font-weight: 750;
+        line-height: 1.25;
+    }
+
+    .appearance-subtitle {
+        color: #94a3b8 !important;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        min-height: 42px !important;
+        background: #111827 !important;
+        border: 1px solid #334155 !important;
+        border-radius: 11px !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-baseweb="select"] span,
+    section[data-testid="stSidebar"] div[data-baseweb="select"] svg {
+        color: #f8fafc !important;
+        fill: #f8fafc !important;
+        -webkit-text-fill-color: #f8fafc !important;
     }
 
     /* Sidebar */
