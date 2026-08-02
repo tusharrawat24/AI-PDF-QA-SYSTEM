@@ -23,9 +23,20 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Hide Streamlit default chrome */
-    #MainMenu, footer, header {
-        visibility: hidden;
+    /* Hide Streamlit menu and footer only */
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+/* Keep the header visible */
+header {
+    visibility: visible !important;
+    background: transparent !important;
+}
     }
 
     /* App background */
