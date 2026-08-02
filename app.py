@@ -544,7 +544,6 @@ default_session_values = {
     "pdf_summary": "",
     "study_notes": "",
     "questions_asked": 0,
-    "last_voice_transcript": "",
 }
 
 for key, default_value in default_session_values.items():
@@ -564,7 +563,6 @@ def clear_application_data() -> None:
     st.session_state.pdf_summary = ""
     st.session_state.study_notes = ""
     st.session_state.questions_asked = 0
-    st.session_state.last_voice_transcript = ""
 
     # Clear the question input when the widget already exists.
     if "pdf_question_input" in st.session_state:
@@ -931,66 +929,18 @@ if st.session_state.study_notes:
 
 
 # ==================================================
-# Question Answering Section — Text + Voice Input
+# Question Answering Section
 # ==================================================
 st.markdown("---")
 st.subheader("💬 Ask a Question From Your PDFs")
 
 st.caption(
-    "Type your question below or use the microphone to convert your voice "
-    "into text. You can review the transcription before asking NeuraDocs."
+    "Type your question below. NeuraDocs will retrieve the most relevant "
+    "content from your uploaded PDFs before generating the answer."
 )
 
-voice_column, language_column = st.columns([3, 1])
-
-with language_column:
-    voice_language_label = st.selectbox(
-        label="Voice language",
-        options=["English (India)", "Hindi (India)"],
-        disabled=not documents_are_ready,
-        key="voice_language_selector",
-    )
-
-voice_language_codes = {
-    "English (India)": "en-IN",
-    "Hindi (India)": "hi-IN",
-}
-
-voice_transcript = None
-
-with voice_column:
-    try:
-        from streamlit_mic_recorder import speech_to_text
-
-        voice_transcript = speech_to_text(
-            language=voice_language_codes[voice_language_label],
-            start_prompt="🎙️ Start Voice Input",
-            stop_prompt="⏹️ Stop Recording",
-            just_once=True,
-            use_container_width=True,
-            key="neuradocs_voice_question",
-        )
-    except ImportError:
-        st.info(
-            "Voice input requires the streamlit-mic-recorder package. "
-            "Install it and add it to requirements.txt."
-        )
-    except Exception as error:
-        st.warning(f"Voice input is temporarily unavailable: {error}")
-
-if (
-    voice_transcript
-    and isinstance(voice_transcript, str)
-    and voice_transcript.strip()
-    and voice_transcript.strip() != st.session_state.last_voice_transcript
-):
-    cleaned_voice_question = voice_transcript.strip()
-    st.session_state.pdf_question_input = cleaned_voice_question
-    st.session_state.last_voice_transcript = cleaned_voice_question
-    st.success(f'🎙️ Voice recognized: "{cleaned_voice_question}"')
-
 question = st.text_input(
-    label="Enter or review your question",
+    label="Enter your question",
     placeholder="Example: What is the main concept explained in this PDF?",
     disabled=not documents_are_ready,
     key="pdf_question_input",
