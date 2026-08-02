@@ -731,6 +731,109 @@ st.markdown(
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
     }}
+
+    /* ==================================================
+       FINAL THEME FIXES
+       ================================================== */
+
+    /* Keep the sidebar consistently dark in both themes */
+    section[data-testid="stSidebar"] {{
+        background: linear-gradient(180deg, #0f172a 0%, #172033 100%) !important;
+        border-right: 1px solid #273449 !important;
+    }}
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] small,
+    section[data-testid="stSidebar"] div {{
+        color: #f8fafc !important;
+        -webkit-text-fill-color: #f8fafc !important;
+        opacity: 1 !important;
+    }}
+
+    section[data-testid="stSidebar"] [data-testid="stAlert"] {{
+        background: #1e3a5f !important;
+        border: 1px solid #2b4f7c !important;
+    }}
+
+    section[data-testid="stSidebar"] [data-testid="stAlert"] * {{
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }}
+
+    /* Main headings and captions follow the selected theme */
+    [data-testid="stAppViewContainer"] .main h1,
+    [data-testid="stAppViewContainer"] .main h2,
+    [data-testid="stAppViewContainer"] .main h3,
+    [data-testid="stAppViewContainer"] .main h4,
+    [data-testid="stAppViewContainer"] .main h5,
+    [data-testid="stAppViewContainer"] .main h6,
+    [data-testid="stAppViewContainer"] .main h1 *,
+    [data-testid="stAppViewContainer"] .main h2 *,
+    [data-testid="stAppViewContainer"] .main h3 *,
+    [data-testid="stAppViewContainer"] .main h4 *,
+    [data-testid="stAppViewContainer"] .main h5 *,
+    [data-testid="stAppViewContainer"] .main h6 * {{
+        color: {theme_values['heading']} !important;
+        -webkit-text-fill-color: {theme_values['heading']} !important;
+        opacity: 1 !important;
+    }}
+
+    [data-testid="stAppViewContainer"] .main [data-testid="stCaptionContainer"],
+    [data-testid="stAppViewContainer"] .main [data-testid="stCaptionContainer"] *,
+    [data-testid="stAppViewContainer"] .main .stCaptionContainer,
+    [data-testid="stAppViewContainer"] .main .stCaptionContainer * {{
+        color: {theme_values['muted_text']} !important;
+        -webkit-text-fill-color: {theme_values['muted_text']} !important;
+        opacity: 1 !important;
+    }}
+
+    /* Streamlit top toolbar/share/GitHub icons */
+    header[data-testid="stHeader"] {{
+        background: transparent !important;
+    }}
+
+    [data-testid="stToolbar"],
+    [data-testid="stToolbar"] *,
+    [data-testid="stAppDeployButton"],
+    [data-testid="stAppDeployButton"] *,
+    [data-testid="stDecoration"],
+    header[data-testid="stHeader"] button,
+    header[data-testid="stHeader"] button *,
+    header[data-testid="stHeader"] a,
+    header[data-testid="stHeader"] a * {{
+        color: {theme_values['heading']} !important;
+        -webkit-text-fill-color: {theme_values['heading']} !important;
+        fill: {theme_values['heading']} !important;
+        stroke: {theme_values['heading']} !important;
+        opacity: 1 !important;
+    }}
+
+    /* Sidebar collapse and reopen buttons */
+    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"],
+    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"] *,
+    section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"],
+    section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] * {{
+        color: #ffffff !important;
+        fill: #ffffff !important;
+        stroke: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }}
+
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapsedControl"] *,
+    [data-testid="collapsedControl"] * {{
+        color: {theme_values['heading']} !important;
+        fill: {theme_values['heading']} !important;
+        stroke: {theme_values['heading']} !important;
+        -webkit-text-fill-color: {theme_values['heading']} !important;
+        opacity: 1 !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True,
