@@ -1,3 +1,7 @@
+import json
+import re
+import time
+
 import streamlit as st
 
 from helpers.pdf_loader import extract_text_from_pdf
@@ -28,6 +32,13 @@ DEFAULT_STATE = {
     "pdf_summary": "",
     "study_notes": "",
     "questions_asked": 0,
+    "quiz_data": [],
+    "quiz_answers": {},
+    "quiz_submitted": False,
+    "flashcards": [],
+    "important_questions": "",
+    "study_pack": {},
+    "last_similarity_average": 0.0,
 }
 
 
@@ -53,6 +64,13 @@ def clear_application_data() -> None:
     st.session_state.pdf_summary = ""
     st.session_state.study_notes = ""
     st.session_state.questions_asked = 0
+    st.session_state.quiz_data = []
+    st.session_state.quiz_answers = {}
+    st.session_state.quiz_submitted = False
+    st.session_state.flashcards = []
+    st.session_state.important_questions = ""
+    st.session_state.study_pack = {}
+    st.session_state.last_similarity_average = 0.0
 
     if "pdf_question_input" in st.session_state:
         st.session_state.pdf_question_input = ""
@@ -61,6 +79,119 @@ def clear_application_data() -> None:
 def build_complete_document_text() -> str:
     """Combine all stored chunks into a single document string."""
     return "\n\n".join(st.session_state.all_chunks)
+
+
+def extract_json_payload(raw_text: str):
+    """Extract and decode JSON from an AI response."""
+    if not raw_text or not raw_text.strip():
+        raise ValueError("The AI provider returned an empty response.")
+
+    cleaned = raw_text.strip()
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        starts = [p for p in (cleaned.find("{"), cleaned.find("[")) if p >= 0]
+        if not starts:
+            raise ValueError("No JSON payload was found in the AI response.")
+        start = min(starts)
+        end = max(cleaned.rfind("}"), cleaned.rfind("]"))
+        if end <= start:
+            raise ValueError("The JSON payload was incomplete.")
+        return json.loads(cleaned[start:end + 1])
+
+
+def generate_quiz(document_text: str, question_count: int = 10):
+    from helpers.gemini_client import generate_content
+    prompt = f"""
+Create exactly {question_count} MCQs using ONLY the PDF content below.
+Return ONLY valid JSON as a list of objects with keys:
+question, options (exactly 4), answer_index (0-3), explanation.
+Avoid duplicate questions and mix difficulty levels.
+
+PDF Content:
+{document_text}
+"""
+    payload = extract_json_payload(generate_content(prompt))
+    if not isinstance(payload, list):
+        raise ValueError("Quiz response must be a JSON list.")
+    quiz = []
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+        q = str(item.get("question", "")).strip()
+        options = item.get("options", [])
+        answer_index = item.get("answer_index")
+        explanation = str(item.get("explanation", "")).strip()
+        if q and isinstance(options, list) and len(options) == 4 and isinstance(answer_index, int) and answer_index in range(4):
+            quiz.append({"question": q, "options": [str(x).strip() for x in options], "answer_index": answer_index, "explanation": explanation})
+    if not quiz:
+        raise ValueError("No valid quiz questions were generated.")
+    return quiz
+
+
+def generate_flashcards(document_text: str, card_count: int = 12):
+    from helpers.gemini_client import generate_content
+    prompt = f"""
+Create exactly {card_count} revision flashcards using ONLY the PDF content.
+Return ONLY valid JSON: [{{"front":"Question or term","back":"Concise answer"}}].
+Avoid duplicates and cover the most important concepts.
+
+PDF Content:
+{document_text}
+"""
+    payload = extract_json_payload(generate_content(prompt))
+    if not isinstance(payload, list):
+        raise ValueError("Flashcard response must be a JSON list.")
+    cards = []
+    for item in payload:
+        if isinstance(item, dict):
+            front = str(item.get("front", "")).strip()
+            back = str(item.get("back", "")).strip()
+            if front and back:
+                cards.append({"front": front, "back": back})
+    if not cards:
+        raise ValueError("No valid flashcards were generated.")
+    return cards
+
+
+def generate_important_questions(document_text: str) -> str:
+    from helpers.gemini_client import generate_content
+    prompt = f"""
+Using ONLY the PDF content, generate clean Markdown sections:
+## 2-Mark Questions (8)
+## 5-Mark Questions (6)
+## 10-Mark Questions (4)
+## Viva Questions (10 with one-line answers)
+
+PDF Content:
+{document_text}
+"""
+    return generate_content(prompt).strip()
+
+
+def generate_study_pack(document_text: str):
+    from helpers.gemini_client import generate_content
+    prompt = f"""
+Create a complete study pack using ONLY the PDF content.
+Return ONLY valid JSON with keys: overview, revision_notes (8 strings),
+key_terms (8 term/definition objects), flashcards (8 front/back objects),
+quiz (5 objects containing question, options[4], answer_index, explanation),
+and viva_questions (8 question/answer objects).
+
+PDF Content:
+{document_text}
+"""
+    payload = extract_json_payload(generate_content(prompt))
+    if not isinstance(payload, dict):
+        raise ValueError("Study pack response must be a JSON object.")
+    return payload
+
+
+def estimate_document_words() -> int:
+    return len(build_complete_document_text().split())
 
 
 def format_user_friendly_error(error: Exception) -> str:
@@ -851,6 +982,13 @@ if uploaded_files:
                     st.session_state.pdf_summary = ""
                     st.session_state.study_notes = ""
                     st.session_state.questions_asked = 0
+                    st.session_state.quiz_data = []
+                    st.session_state.quiz_answers = {}
+                    st.session_state.quiz_submitted = False
+                    st.session_state.flashcards = []
+                    st.session_state.important_questions = ""
+                    st.session_state.study_pack = {}
+                    st.session_state.last_similarity_average = 0.0
 
                 except Exception as error:
                     st.error(format_user_friendly_error(error))
@@ -907,30 +1045,34 @@ else:
 # ============================================================
 # Dashboard
 # ============================================================
-metric_col_1, metric_col_2, metric_col_3, metric_col_4 = st.columns(4)
+document_words = estimate_document_words() if documents_are_ready else 0
+estimated_reading_minutes = max(1, round(document_words / 220)) if document_words else 0
+
+metric_col_1, metric_col_2, metric_col_3 = st.columns(3)
+metric_col_4, metric_col_5, metric_col_6 = st.columns(3)
 
 with metric_col_1:
     st.metric("PDFs", pdf_count)
-
 with metric_col_2:
     st.metric("Chunks", chunk_count)
-
 with metric_col_3:
     st.metric("Embeddings", embedding_count)
-
 with metric_col_4:
     st.metric("Questions", st.session_state.questions_asked)
+with metric_col_5:
+    st.metric("Est. reading", f"{estimated_reading_minutes} min")
+with metric_col_6:
+    similarity_percent = f"{st.session_state.last_similarity_average * 100:.1f}%" if st.session_state.last_similarity_average else "—"
+    st.metric("Avg. similarity", similarity_percent)
 
 
 # ============================================================
 # Main workspace tabs
 # ============================================================
-overview_tab, summary_tab, notes_tab, ask_tab = st.tabs(
+(overview_tab, summary_tab, notes_tab, ask_tab, quiz_tab, flashcards_tab, questions_tab, study_mode_tab) = st.tabs(
     [
-        "📁 Overview",
-        "📝 Summary",
-        "📚 Study Notes",
-        "💬 Ask AI",
+        "📁 Overview", "📝 Summary", "📚 Study Notes", "💬 Ask AI",
+        "🧠 Quiz", "🃏 Flashcards", "❓ Important Questions", "🎓 Study Mode",
     ]
 )
 
@@ -1185,6 +1327,10 @@ with ask_tab:
                             context=retrieved_context,
                         )
 
+                        valid_scores = [float(result.get("score", 0.0)) for result in retrieval_results]
+                        if valid_scores:
+                            st.session_state.last_similarity_average = sum(valid_scores) / len(valid_scores)
+
                         st.session_state.questions_asked += 1
                         st.session_state.chat_history.append(
                             {
@@ -1264,6 +1410,132 @@ with ask_tab:
         st.caption(
             "Your answers and source citations will appear here."
         )
+
+
+# ------------------------------------------------------------
+# Quiz tab
+# ------------------------------------------------------------
+with quiz_tab:
+    st.markdown("""<div class="premium-card"><div class="section-kicker">SELF ASSESSMENT</div><div class="section-title">AI Quiz Generator</div><div class="section-copy">Generate MCQs directly from uploaded PDFs and check your score instantly.</div></div>""", unsafe_allow_html=True)
+    quiz_count = st.slider("Number of questions", 5, 15, 10, disabled=not documents_are_ready, key="quiz_question_count")
+    if st.button("🧠 Generate quiz", use_container_width=True, disabled=not documents_are_ready, key="generate_quiz_button"):
+        try:
+            with st.spinner("Creating a balanced quiz from your PDFs..."):
+                st.session_state.quiz_data = generate_quiz(build_complete_document_text(), quiz_count)
+                st.session_state.quiz_answers = {}
+                st.session_state.quiz_submitted = False
+        except Exception as error:
+            st.error(format_user_friendly_error(error))
+    if st.session_state.quiz_data:
+        with st.form("quiz_answer_form"):
+            for index, item in enumerate(st.session_state.quiz_data):
+                st.markdown(f"#### {index + 1}. {item['question']}")
+                st.session_state.quiz_answers[index] = st.radio("Choose an answer", list(range(4)), format_func=lambda option_index, options=item["options"]: options[option_index], index=None, key=f"quiz_answer_{index}", label_visibility="collapsed")
+            quiz_submitted = st.form_submit_button("✅ Submit quiz", use_container_width=True)
+        if quiz_submitted:
+            st.session_state.quiz_submitted = True
+        if st.session_state.quiz_submitted:
+            score = 0
+            for index, item in enumerate(st.session_state.quiz_data):
+                selected = st.session_state.quiz_answers.get(index)
+                correct = item["answer_index"]
+                if selected == correct:
+                    score += 1
+                    st.success(f"Question {index + 1}: Correct — {item['options'][correct]}")
+                else:
+                    st.error(f"Question {index + 1}: Correct answer — {item['options'][correct]}")
+                if item.get("explanation"):
+                    st.caption(item["explanation"])
+            total = len(st.session_state.quiz_data)
+            st.metric("Quiz score", f"{score}/{total}", delta=f"{(score / total) * 100:.0f}%")
+    elif documents_are_ready:
+        st.caption("Generate a quiz to begin your self-assessment.")
+
+
+# ------------------------------------------------------------
+# Flashcards tab
+# ------------------------------------------------------------
+with flashcards_tab:
+    st.markdown("""<div class="premium-card"><div class="section-kicker">ACTIVE RECALL</div><div class="section-title">AI Flashcards</div><div class="section-copy">Build quick revision cards from the most important document concepts.</div></div>""", unsafe_allow_html=True)
+    flashcard_count = st.slider("Number of flashcards", 6, 20, 12, disabled=not documents_are_ready, key="flashcard_count")
+    if st.button("🃏 Generate flashcards", use_container_width=True, disabled=not documents_are_ready, key="generate_flashcards_button"):
+        try:
+            with st.spinner("Creating revision flashcards..."):
+                st.session_state.flashcards = generate_flashcards(build_complete_document_text(), flashcard_count)
+        except Exception as error:
+            st.error(format_user_friendly_error(error))
+    if st.session_state.flashcards:
+        for index, card in enumerate(st.session_state.flashcards, 1):
+            with st.expander(f"Card {index}: {card['front']}"):
+                st.markdown(card["back"])
+    elif documents_are_ready:
+        st.caption("Generate flashcards for active recall practice.")
+
+
+# ------------------------------------------------------------
+# Important questions tab
+# ------------------------------------------------------------
+with questions_tab:
+    st.markdown("""<div class="premium-card"><div class="section-kicker">EXAM PREPARATION</div><div class="section-title">Important Questions Generator</div><div class="section-copy">Create 2-mark, 5-mark, 10-mark, and viva questions from your PDFs.</div></div>""", unsafe_allow_html=True)
+    if st.button("❓ Generate important questions", use_container_width=True, disabled=not documents_are_ready, key="generate_important_questions_button"):
+        try:
+            with st.spinner("Preparing exam and viva questions..."):
+                st.session_state.important_questions = generate_important_questions(build_complete_document_text())
+        except Exception as error:
+            st.error(format_user_friendly_error(error))
+    if st.session_state.important_questions:
+        st.markdown(st.session_state.important_questions)
+        st.download_button("📥 Download questions as text", st.session_state.important_questions, "NeuraDocs_Important_Questions.txt", "text/plain", use_container_width=True, key="download_important_questions_button")
+    elif documents_are_ready:
+        st.caption("Generate question sets for exams and viva preparation.")
+
+
+# ------------------------------------------------------------
+# Study Mode tab
+# ------------------------------------------------------------
+with study_mode_tab:
+    st.markdown("""<div class="premium-card"><div class="section-kicker">ALL-IN-ONE LEARNING</div><div class="section-title">AI Study Mode</div><div class="section-copy">Generate overview, revision notes, key terms, flashcards, quiz, and viva questions in one request.</div></div>""", unsafe_allow_html=True)
+    if st.button("🎓 Build complete study pack", use_container_width=True, disabled=not documents_are_ready, key="generate_study_pack_button"):
+        try:
+            with st.spinner("Building your complete AI study pack..."):
+                started = time.perf_counter()
+                st.session_state.study_pack = generate_study_pack(build_complete_document_text())
+                st.success(f"Study pack created in {time.perf_counter() - started:.1f} seconds.")
+        except Exception as error:
+            st.error(format_user_friendly_error(error))
+    pack = st.session_state.study_pack
+    if pack:
+        st.markdown("### Overview")
+        st.write(pack.get("overview", ""))
+        st.markdown("### Revision notes")
+        for point in pack.get("revision_notes", []):
+            st.markdown(f"- {point}")
+        st.markdown("### Key terms")
+        for item in pack.get("key_terms", []):
+            if isinstance(item, dict):
+                st.markdown(f"**{item.get('term', 'Term')}** — {item.get('definition', '')}")
+        st.markdown("### Flashcards")
+        for index, card in enumerate(pack.get("flashcards", []), 1):
+            if isinstance(card, dict):
+                with st.expander(f"{index}. {card.get('front', 'Flashcard')}"):
+                    st.write(card.get("back", ""))
+        st.markdown("### Mini quiz")
+        for index, item in enumerate(pack.get("quiz", []), 1):
+            if isinstance(item, dict):
+                st.markdown(f"**{index}. {item.get('question', '')}**")
+                options = item.get("options", [])
+                answer_index = item.get("answer_index", 0)
+                for option_index, option in enumerate(options):
+                    st.write(f"{'✅' if option_index == answer_index else '•'} {option}")
+                if item.get("explanation"):
+                    st.caption(item["explanation"])
+        st.markdown("### Viva questions")
+        for index, item in enumerate(pack.get("viva_questions", []), 1):
+            if isinstance(item, dict):
+                st.markdown(f"**{index}. {item.get('question', '')}**")
+                st.write(item.get("answer", ""))
+    elif documents_are_ready:
+        st.caption("Build one complete pack for fast revision and viva practice.")
 
 
 # ============================================================
