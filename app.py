@@ -39,6 +39,9 @@ DEFAULT_STATE = {
     "important_questions": "",
     "study_pack": {},
     "last_similarity_average": 0.0,
+    "bookmarks": [],
+    "ai_tools_output": {},
+    "document_search_results": [],
 }
 
 
@@ -71,6 +74,9 @@ def clear_application_data() -> None:
     st.session_state.important_questions = ""
     st.session_state.study_pack = {}
     st.session_state.last_similarity_average = 0.0
+    st.session_state.bookmarks = []
+    st.session_state.ai_tools_output = {}
+    st.session_state.document_search_results = []
 
     if "pdf_question_input" in st.session_state:
         st.session_state.pdf_question_input = ""
@@ -192,6 +198,84 @@ PDF Content:
 
 def estimate_document_words() -> int:
     return len(build_complete_document_text().split())
+
+
+def generate_ai_tool_output(document_text: str, tool_name: str) -> str:
+    """Generate specialized learning content from the uploaded PDFs."""
+    from helpers.gemini_client import generate_content
+
+    tool_prompts = {
+        "Table of Contents": """
+Create a clean hierarchical table of contents from the PDF.
+Use Markdown headings and numbered chapters/sections.
+Do not invent sections that are not supported by the document.
+""",
+        "Mind Map": """
+Create a text-based mind map of the PDF's major concepts.
+Use this format:
+Main Topic
+├── Branch
+│   ├── Subtopic
+│   └── Subtopic
+└── Branch
+Return the mind map inside one Markdown code block and add a short explanation below it.
+""",
+        "Concept Map": """
+Create a structured concept map showing important concepts and their relationships.
+Use arrows such as: Concept A → leads to → Concept B.
+Use only information from the PDF.
+""",
+        "Timeline": """
+Create a chronological timeline from the PDF.
+If the PDF contains no meaningful dates or sequence of events, clearly say that a timeline is not applicable.
+""",
+        "Formula Sheet": """
+Extract and organize every important formula, equation, symbol, and short explanation from the PDF.
+Do not create formulas that are not present.
+""",
+        "Code Examples": """
+Extract programming concepts from the PDF and create helpful code examples only where supported by the document.
+If the PDF is not about programming, clearly state that code examples are not applicable.
+""",
+        "Diagram Ideas": """
+Suggest clear educational diagrams that can be drawn from the PDF content.
+For each diagram provide: title, components, connections, and what it explains.
+Do not claim that an actual image has been generated.
+""",
+    }
+
+    instruction = tool_prompts[tool_name]
+
+    prompt = f"""
+You are an academic document assistant.
+
+{instruction}
+
+Use ONLY the PDF content below. Keep the output accurate, structured,
+and suitable for university students.
+
+PDF Content:
+{document_text}
+"""
+
+    return generate_content(prompt).strip()
+
+
+def build_chat_export_text() -> str:
+    """Build a plain-text transcript of the current conversation."""
+    lines = ["NeuraDocs Conversation Export", "=" * 32, ""]
+
+    for index, chat in enumerate(st.session_state.chat_history, start=1):
+        lines.append(f"Question {index}:")
+        lines.append(chat.get("question", ""))
+        lines.append("")
+        lines.append("Answer:")
+        lines.append(chat.get("answer", ""))
+        lines.append("")
+        lines.append("-" * 32)
+        lines.append("")
+
+    return "\\n".join(lines)
 
 
 def format_user_friendly_error(error: Exception) -> str:
@@ -989,6 +1073,9 @@ if uploaded_files:
                     st.session_state.important_questions = ""
                     st.session_state.study_pack = {}
                     st.session_state.last_similarity_average = 0.0
+                    st.session_state.bookmarks = []
+                    st.session_state.ai_tools_output = {}
+                    st.session_state.document_search_results = []
 
                 except Exception as error:
                     st.error(format_user_friendly_error(error))
@@ -1069,10 +1156,33 @@ with metric_col_6:
 # ============================================================
 # Main workspace tabs
 # ============================================================
-(overview_tab, summary_tab, notes_tab, ask_tab, quiz_tab, flashcards_tab, questions_tab, study_mode_tab) = st.tabs(
+(
+    overview_tab,
+    summary_tab,
+    notes_tab,
+    ask_tab,
+    quiz_tab,
+    flashcards_tab,
+    questions_tab,
+    study_mode_tab,
+    search_tab,
+    tools_tab,
+    bookmarks_tab,
+    analytics_tab,
+) = st.tabs(
     [
-        "📁 Overview", "📝 Summary", "📚 Study Notes", "💬 Ask AI",
-        "🧠 Quiz", "🃏 Flashcards", "❓ Important Questions", "🎓 Study Mode",
+        "📁 Overview",
+        "📝 Summary",
+        "📚 Study Notes",
+        "💬 Ask AI",
+        "🧠 Quiz",
+        "🃏 Flashcards",
+        "❓ Important Questions",
+        "🎓 Study Mode",
+        "🔍 Smart Search",
+        "🛠️ AI Tools",
+        "⭐ Bookmarks",
+        "📈 Analytics",
     ]
 )
 
@@ -1359,12 +1469,76 @@ with ask_tab:
                 st.session_state.chat_history = []
                 st.rerun()
 
-        for chat in st.session_state.chat_history:
+        chat_export_text = build_chat_export_text()
+
+        export_col_1, export_col_2 = st.columns(2)
+        with export_col_1:
+            st.download_button(
+                "📥 Export full chat as text",
+                data=chat_export_text,
+                file_name="NeuraDocs_Conversation.txt",
+                mime="text/plain",
+                use_container_width=True,
+                key="export_full_chat_text",
+            )
+        with export_col_2:
+            try:
+                from helpers.pdf_exporter import create_pdf
+
+                chat_pdf = create_pdf(
+                    "NeuraDocs - Conversation",
+                    chat_export_text,
+                )
+                st.download_button(
+                    "📄 Export full chat as PDF",
+                    data=chat_pdf,
+                    file_name="NeuraDocs_Conversation.pdf",
+                    mime="application/pdf",
+                    use_container_width=True,
+                    key="export_full_chat_pdf",
+                )
+            except Exception:
+                st.caption("PDF chat export is unavailable.")
+
+        for chat_index, chat in enumerate(list(st.session_state.chat_history)):
             with st.chat_message("user"):
                 st.markdown(chat["question"])
 
             with st.chat_message("assistant"):
                 st.markdown(chat["answer"])
+
+                action_col_1, action_col_2 = st.columns(2)
+
+                with action_col_1:
+                    bookmark_exists = any(
+                        saved.get("question") == chat.get("question")
+                        and saved.get("answer") == chat.get("answer")
+                        for saved in st.session_state.bookmarks
+                    )
+
+                    if st.button(
+                        "✅ Bookmarked" if bookmark_exists else "⭐ Bookmark",
+                        key=f"bookmark_chat_{chat_index}",
+                        use_container_width=True,
+                        disabled=bookmark_exists,
+                    ):
+                        st.session_state.bookmarks.append(
+                            {
+                                "question": chat.get("question", ""),
+                                "answer": chat.get("answer", ""),
+                                "sources": chat.get("sources", []),
+                            }
+                        )
+                        st.rerun()
+
+                with action_col_2:
+                    if st.button(
+                        "🗑️ Delete answer",
+                        key=f"delete_chat_{chat_index}",
+                        use_container_width=True,
+                    ):
+                        st.session_state.chat_history.pop(chat_index)
+                        st.rerun()
 
                 if chat.get("sources"):
                     with st.expander("Sources used"):
@@ -1536,6 +1710,247 @@ with study_mode_tab:
                 st.write(item.get("answer", ""))
     elif documents_are_ready:
         st.caption("Build one complete pack for fast revision and viva practice.")
+
+
+
+# ------------------------------------------------------------
+# Smart Search tab
+# ------------------------------------------------------------
+with search_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">IN-DOCUMENT DISCOVERY</div>
+            <div class="section-title">Smart Search</div>
+            <div class="section-copy">
+                Search the indexed chunks and inspect the closest matching passages.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    search_query = st.text_input(
+        "Search inside uploaded PDFs",
+        placeholder="Example: operating system, neural network, conclusion...",
+        disabled=not documents_are_ready,
+        key="smart_search_query",
+    )
+
+    if st.button(
+        "🔍 Search documents",
+        use_container_width=True,
+        disabled=not documents_are_ready,
+        key="smart_search_button",
+    ):
+        if not search_query.strip():
+            st.warning("Enter a search query.")
+        else:
+            try:
+                from helpers.embedding_model import create_query_embedding
+
+                search_embedding = create_query_embedding(search_query)
+                st.session_state.document_search_results = (
+                    search_similar_chunks(
+                        question_embedding=search_embedding,
+                        index=st.session_state.faiss_index,
+                        chunks=st.session_state.all_chunks,
+                        top_k=10,
+                    )
+                )
+            except Exception as error:
+                st.error(format_user_friendly_error(error))
+
+    for result_index, result in enumerate(
+        st.session_state.document_search_results,
+        start=1,
+    ):
+        details = extract_source_details(result["chunk"])
+        pdf_name = details.get("pdf_name", "Unknown PDF")
+        chunk_number = details.get("original_chunk_number", "—")
+        score = float(result.get("score", 0.0))
+
+        with st.expander(
+            f"{result_index}. {pdf_name} · Chunk {chunk_number} · "
+            f"Similarity {score * 100:.1f}%"
+        ):
+            st.code(result["chunk"], language=None)
+
+
+# ------------------------------------------------------------
+# AI Tools tab
+# ------------------------------------------------------------
+with tools_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">SPECIALIZED GENERATORS</div>
+            <div class="section-title">AI Learning Tools</div>
+            <div class="section-copy">
+                Generate document structure, mind maps, timelines, formulas,
+                concept maps, code examples, and diagram plans.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    selected_tool = st.selectbox(
+        "Choose a tool",
+        [
+            "Table of Contents",
+            "Mind Map",
+            "Concept Map",
+            "Timeline",
+            "Formula Sheet",
+            "Code Examples",
+            "Diagram Ideas",
+        ],
+        disabled=not documents_are_ready,
+        key="selected_ai_tool",
+    )
+
+    if st.button(
+        f"✨ Generate {selected_tool}",
+        use_container_width=True,
+        disabled=not documents_are_ready,
+        key="generate_selected_ai_tool",
+    ):
+        try:
+            with st.spinner(f"Generating {selected_tool.lower()}..."):
+                st.session_state.ai_tools_output[selected_tool] = (
+                    generate_ai_tool_output(
+                        build_complete_document_text(),
+                        selected_tool,
+                    )
+                )
+        except Exception as error:
+            st.error(format_user_friendly_error(error))
+
+    if selected_tool in st.session_state.ai_tools_output:
+        tool_output = st.session_state.ai_tools_output[selected_tool]
+        st.markdown(tool_output)
+
+        st.download_button(
+            f"📥 Download {selected_tool}",
+            data=tool_output,
+            file_name=f"NeuraDocs_{selected_tool.replace(' ', '_')}.txt",
+            mime="text/plain",
+            use_container_width=True,
+            key=f"download_{selected_tool}",
+        )
+
+
+# ------------------------------------------------------------
+# Bookmarks tab
+# ------------------------------------------------------------
+with bookmarks_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">SAVED KNOWLEDGE</div>
+            <div class="section-title">Bookmarked Answers</div>
+            <div class="section-copy">
+                Save important AI answers for quick revision and later export.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.session_state.bookmarks:
+        bookmark_export_parts = []
+
+        for bookmark_index, bookmark in enumerate(
+            list(st.session_state.bookmarks)
+        ):
+            with st.expander(
+                f"{bookmark_index + 1}. {bookmark.get('question', 'Saved answer')}",
+                expanded=bookmark_index == 0,
+            ):
+                st.markdown(bookmark.get("answer", ""))
+
+                if st.button(
+                    "Remove bookmark",
+                    key=f"remove_bookmark_{bookmark_index}",
+                ):
+                    st.session_state.bookmarks.pop(bookmark_index)
+                    st.rerun()
+
+            bookmark_export_parts.append(
+                f"Question: {bookmark.get('question', '')}\\n"
+                f"Answer: {bookmark.get('answer', '')}\\n"
+                + "-" * 40
+            )
+
+        bookmark_export_text = "\\n\\n".join(bookmark_export_parts)
+
+        st.download_button(
+            "📥 Export all bookmarks",
+            data=bookmark_export_text,
+            file_name="NeuraDocs_Bookmarks.txt",
+            mime="text/plain",
+            use_container_width=True,
+            key="export_all_bookmarks",
+        )
+    else:
+        st.info("Bookmark useful answers from the Ask AI tab.")
+
+
+# ------------------------------------------------------------
+# Analytics tab
+# ------------------------------------------------------------
+with analytics_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">WORKSPACE INSIGHTS</div>
+            <div class="section-title">Analytics Dashboard</div>
+            <div class="section-copy">
+                Review document size, engagement, generated learning assets,
+                and current retrieval quality.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    analytics_data = {
+        "PDFs": pdf_count,
+        "Chunks": chunk_count,
+        "Questions": st.session_state.questions_asked,
+        "Bookmarks": len(st.session_state.bookmarks),
+        "Quiz Items": len(st.session_state.quiz_data),
+        "Flashcards": len(st.session_state.flashcards),
+    }
+
+    st.bar_chart(analytics_data)
+
+    stat_col_1, stat_col_2, stat_col_3 = st.columns(3)
+
+    with stat_col_1:
+        st.metric("Document words", document_words)
+
+    with stat_col_2:
+        st.metric(
+            "Estimated reading",
+            f"{estimated_reading_minutes} min",
+        )
+
+    with stat_col_3:
+        st.metric(
+            "Average similarity",
+            (
+                f"{st.session_state.last_similarity_average * 100:.1f}%"
+                if st.session_state.last_similarity_average
+                else "—"
+            ),
+        )
+
+    st.caption(
+        "Analytics are session-based. A persistent user library and cross-session "
+        "history require a database and authentication layer."
+    )
 
 
 # ============================================================
