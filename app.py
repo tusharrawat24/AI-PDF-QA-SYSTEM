@@ -1556,7 +1556,7 @@ learning_assets = (
     + len(st.session_state.bookmarks)
 )
 
-st.markdown(
+st.html(
     f"""
     <style>
     .dash-shell {{
