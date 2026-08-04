@@ -1,4 +1,4 @@
-import json
+﻿import json
 import re
 import time
 
@@ -15,7 +15,7 @@ from helpers.vector_store import create_faiss_index, search_similar_chunks
 # ============================================================
 st.set_page_config(
     page_title="NeuraDocs",
-    page_icon="🧠",
+    page_icon="ðŸ§ ",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -214,15 +214,15 @@ Do not invent sections that are not supported by the document.
 Create a text-based mind map of the PDF's major concepts.
 Use this format:
 Main Topic
-├── Branch
-│   ├── Subtopic
-│   └── Subtopic
-└── Branch
+â”œâ”€â”€ Branch
+â”‚   â”œâ”€â”€ Subtopic
+â”‚   â””â”€â”€ Subtopic
+â””â”€â”€ Branch
 Return the mind map inside one Markdown code block and add a short explanation below it.
 """,
         "Concept Map": """
 Create a structured concept map showing important concepts and their relationships.
-Use arrows such as: Concept A → leads to → Concept B.
+Use arrows such as: Concept A â†’ leads to â†’ Concept B.
 Use only information from the PDF.
 """,
         "Timeline": """
@@ -337,7 +337,7 @@ with st.sidebar:
     st.markdown(
         """
         <div class="side-brand">
-            <div class="side-logo">🧠</div>
+            <div class="side-logo">ðŸ§ </div>
             <div>
                 <div class="side-title">NeuraDocs</div>
                 <div class="side-subtitle">AI PDF Study Assistant</div>
@@ -373,7 +373,7 @@ with st.sidebar:
     )
 
     if st.button(
-        "🗑️ Clear workspace",
+        "ðŸ—‘ï¸ Clear workspace",
         use_container_width=True,
         key="clear_workspace_button",
     ):
@@ -1327,13 +1327,13 @@ st.markdown(
                 </div>
                 <div class="hero-copy">
                     Turn complex PDFs into answers, notes, quizzes, flashcards,
-                    mind maps, and revision packs — all from one intelligent workspace.
+                    mind maps, and revision packs â€” all from one intelligent workspace.
                 </div>
                 <div class="hero-pills">
-                    <div class="hero-pill">⚡ Semantic Search</div>
-                    <div class="hero-pill">🧠 RAG Intelligence</div>
-                    <div class="hero-pill">🎓 Study Mode</div>
-                    <div class="hero-pill">📄 Smart Export</div>
+                    <div class="hero-pill">âš¡ Semantic Search</div>
+                    <div class="hero-pill">ðŸ§  RAG Intelligence</div>
+                    <div class="hero-pill">ðŸŽ“ Study Mode</div>
+                    <div class="hero-pill">ðŸ“„ Smart Export</div>
                 </div>
             </div>
             <div class="hero-right">
@@ -1355,7 +1355,7 @@ st.markdown(
                     </div>
                     <div class="hero-ai-stat">
                         <span>Outputs</span>
-                        <b>Answers · Notes · Quiz</b>
+                        <b>Answers Â· Notes Â· Quiz</b>
                     </div>
                 </div>
             </div>
@@ -1370,19 +1370,19 @@ st.markdown(
     """
     <div class="top-feature-strip">
         <div class="top-feature-item">
-            <span class="top-feature-icon">📂</span>
+            <span class="top-feature-icon">ðŸ“‚</span>
             <div><b>Upload</b><small>Multiple PDFs</small></div>
         </div>
         <div class="top-feature-item">
-            <span class="top-feature-icon">🧩</span>
+            <span class="top-feature-icon">ðŸ§©</span>
             <div><b>Understand</b><small>Embeddings + FAISS</small></div>
         </div>
         <div class="top-feature-item">
-            <span class="top-feature-icon">💬</span>
+            <span class="top-feature-icon">ðŸ’¬</span>
             <div><b>Interact</b><small>Context-aware answers</small></div>
         </div>
         <div class="top-feature-item">
-            <span class="top-feature-icon">🎓</span>
+            <span class="top-feature-icon">ðŸŽ“</span>
             <div><b>Learn</b><small>Notes, quiz, flashcards</small></div>
         </div>
     </div>
@@ -1515,10 +1515,10 @@ if not documents_are_ready:
                 index, and prepare them for intelligent search.
             </div>
             <div class="empty-grid">
-                <div class="feature-chip">💬 Ask Questions</div>
-                <div class="feature-chip">📝 Build Summaries</div>
-                <div class="feature-chip">📚 Create Notes</div>
-                <div class="feature-chip">📥 Export Results</div>
+                <div class="feature-chip">ðŸ’¬ Ask Questions</div>
+                <div class="feature-chip">ðŸ“ Build Summaries</div>
+                <div class="feature-chip">ðŸ“š Create Notes</div>
+                <div class="feature-chip">ðŸ“¥ Export Results</div>
             </div>
         </div>
         """,
@@ -1526,7 +1526,7 @@ if not documents_are_ready:
     )
 else:
     st.success(
-        "Documents indexed successfully — your AI workspace is ready."
+        "Documents indexed successfully â€” your AI workspace is ready."
     )
 
 
@@ -1547,7 +1547,7 @@ similarity_value = (
 )
 
 workspace_status = "Ready" if documents_are_ready else "Waiting"
-workspace_status_icon = "●" if documents_are_ready else "○"
+workspace_status_icon = "â—" if documents_are_ready else "â—‹"
 index_progress = 100 if documents_are_ready else 8
 
 learning_assets = (
@@ -1556,7 +1556,7 @@ learning_assets = (
     + len(st.session_state.bookmarks)
 )
 
-st.html(
+st.markdown(
     f"""
     <style>
     .dash-shell {{
@@ -1840,7 +1840,7 @@ st.html(
                 <div class="dash-eyebrow">SMART WORKSPACE DASHBOARD</div>
                 <div class="dash-title">Everything you need,<br>at one glance.</div>
                 <div class="dash-subtitle">
-                    Your live document intelligence overview — files, indexing,
+                    Your live document intelligence overview â€” files, indexing,
                     learning assets, and retrieval performance.
                 </div>
                 <div class="dash-progress-wrap">
@@ -1863,28 +1863,28 @@ st.html(
 
         <div class="metric-grid-pro">
             <div class="metric-pro">
-                <div class="metric-icon-pro">📄</div>
+                <div class="metric-icon-pro">ðŸ“„</div>
                 <div class="metric-name-pro">PDF DOCUMENTS</div>
                 <div class="metric-value-pro">{pdf_count}</div>
                 <div class="metric-note-pro">Files in current workspace</div>
             </div>
 
             <div class="metric-pro">
-                <div class="metric-icon-pro">🧩</div>
+                <div class="metric-icon-pro">ðŸ§©</div>
                 <div class="metric-name-pro">TEXT CHUNKS</div>
                 <div class="metric-value-pro">{chunk_count}</div>
                 <div class="metric-note-pro">Searchable knowledge units</div>
             </div>
 
             <div class="metric-pro">
-                <div class="metric-icon-pro">🧠</div>
+                <div class="metric-icon-pro">ðŸ§ </div>
                 <div class="metric-name-pro">VECTOR EMBEDDINGS</div>
                 <div class="metric-value-pro">{embedding_count}</div>
                 <div class="metric-note-pro">Indexed semantic vectors</div>
             </div>
 
             <div class="metric-pro">
-                <div class="metric-icon-pro">💬</div>
+                <div class="metric-icon-pro">ðŸ’¬</div>
                 <div class="metric-name-pro">AI QUESTIONS</div>
                 <div class="metric-value-pro">{st.session_state.questions_asked}</div>
                 <div class="metric-note-pro">Questions answered this session</div>
@@ -1932,18 +1932,18 @@ st.html(
     analytics_tab,
 ) = st.tabs(
     [
-        "📁 Overview",
-        "📝 Summary",
-        "📚 Study Notes",
-        "💬 Ask AI",
-        "🧠 Quiz",
-        "🃏 Flashcards",
-        "❓ Important Questions",
-        "🎓 Study Mode",
-        "🔍 Smart Search",
-        "🛠️ AI Tools",
-        "⭐ Bookmarks",
-        "📈 Analytics",
+        "ðŸ“ Overview",
+        "ðŸ“ Summary",
+        "ðŸ“š Study Notes",
+        "ðŸ’¬ Ask AI",
+        "ðŸ§  Quiz",
+        "ðŸƒ Flashcards",
+        "â“ Important Questions",
+        "ðŸŽ“ Study Mode",
+        "ðŸ” Smart Search",
+        "ðŸ› ï¸ AI Tools",
+        "â­ Bookmarks",
+        "ðŸ“ˆ Analytics",
     ]
 )
 
@@ -1971,7 +1971,7 @@ with overview_tab:
         with left_column:
             st.markdown("#### Uploaded files")
             for pdf_file in uploaded_files or []:
-                st.write(f"📄 {pdf_file.name}")
+                st.write(f"ðŸ“„ {pdf_file.name}")
 
         with right_column:
             with st.expander(
@@ -2007,7 +2007,7 @@ with summary_tab:
     )
 
     if st.button(
-        "✨ Generate document summary",
+        "âœ¨ Generate document summary",
         use_container_width=True,
         disabled=not documents_are_ready,
         key="generate_pdf_summary_button",
@@ -2039,7 +2039,7 @@ with summary_tab:
             )
 
             st.download_button(
-                label="📥 Download summary as PDF",
+                label="ðŸ“¥ Download summary as PDF",
                 data=summary_pdf,
                 file_name="NeuraDocs_PDF_Summary.pdf",
                 mime="application/pdf",
@@ -2076,7 +2076,7 @@ with notes_tab:
     )
 
     if st.button(
-        "📚 Generate study notes",
+        "ðŸ“š Generate study notes",
         use_container_width=True,
         disabled=not documents_are_ready,
         key="generate_study_notes_button",
@@ -2108,7 +2108,7 @@ with notes_tab:
             )
 
             st.download_button(
-                label="📥 Download study notes as PDF",
+                label="ðŸ“¥ Download study notes as PDF",
                 data=notes_pdf,
                 file_name="NeuraDocs_Study_Notes.pdf",
                 mime="application/pdf",
@@ -2157,7 +2157,7 @@ with ask_tab:
         )
 
         ask_submitted = st.form_submit_button(
-            "🚀 Ask NeuraDocs",
+            "ðŸš€ Ask NeuraDocs",
             type="primary",
             use_container_width=True,
             disabled=not documents_are_ready,
@@ -2235,7 +2235,7 @@ with ask_tab:
         export_col_1, export_col_2 = st.columns(2)
         with export_col_1:
             st.download_button(
-                "📥 Export full chat as text",
+                "ðŸ“¥ Export full chat as text",
                 data=chat_export_text,
                 file_name="NeuraDocs_Conversation.txt",
                 mime="text/plain",
@@ -2251,7 +2251,7 @@ with ask_tab:
                     chat_export_text,
                 )
                 st.download_button(
-                    "📄 Export full chat as PDF",
+                    "ðŸ“„ Export full chat as PDF",
                     data=chat_pdf,
                     file_name="NeuraDocs_Conversation.pdf",
                     mime="application/pdf",
@@ -2278,7 +2278,7 @@ with ask_tab:
                     )
 
                     if st.button(
-                        "✅ Bookmarked" if bookmark_exists else "⭐ Bookmark",
+                        "âœ… Bookmarked" if bookmark_exists else "â­ Bookmark",
                         key=f"bookmark_chat_{chat_index}",
                         use_container_width=True,
                         disabled=bookmark_exists,
@@ -2294,7 +2294,7 @@ with ask_tab:
 
                 with action_col_2:
                     if st.button(
-                        "🗑️ Delete answer",
+                        "ðŸ—‘ï¸ Delete answer",
                         key=f"delete_chat_{chat_index}",
                         use_container_width=True,
                     ):
@@ -2353,7 +2353,7 @@ with ask_tab:
 with quiz_tab:
     st.markdown("""<div class="premium-card"><div class="section-kicker">SELF ASSESSMENT</div><div class="section-title">AI Quiz Generator</div><div class="section-copy">Generate MCQs directly from uploaded PDFs and check your score instantly.</div></div>""", unsafe_allow_html=True)
     quiz_count = st.slider("Number of questions", 5, 15, 10, disabled=not documents_are_ready, key="quiz_question_count")
-    if st.button("🧠 Generate quiz", use_container_width=True, disabled=not documents_are_ready, key="generate_quiz_button"):
+    if st.button("ðŸ§  Generate quiz", use_container_width=True, disabled=not documents_are_ready, key="generate_quiz_button"):
         try:
             with st.spinner("Creating a balanced quiz from your PDFs..."):
                 st.session_state.quiz_data = generate_quiz(build_complete_document_text(), quiz_count)
@@ -2366,7 +2366,7 @@ with quiz_tab:
             for index, item in enumerate(st.session_state.quiz_data):
                 st.markdown(f"#### {index + 1}. {item['question']}")
                 st.session_state.quiz_answers[index] = st.radio("Choose an answer", list(range(4)), format_func=lambda option_index, options=item["options"]: options[option_index], index=None, key=f"quiz_answer_{index}", label_visibility="collapsed")
-            quiz_submitted = st.form_submit_button("✅ Submit quiz", use_container_width=True)
+            quiz_submitted = st.form_submit_button("âœ… Submit quiz", use_container_width=True)
         if quiz_submitted:
             st.session_state.quiz_submitted = True
         if st.session_state.quiz_submitted:
@@ -2376,9 +2376,9 @@ with quiz_tab:
                 correct = item["answer_index"]
                 if selected == correct:
                     score += 1
-                    st.success(f"Question {index + 1}: Correct — {item['options'][correct]}")
+                    st.success(f"Question {index + 1}: Correct â€” {item['options'][correct]}")
                 else:
-                    st.error(f"Question {index + 1}: Correct answer — {item['options'][correct]}")
+                    st.error(f"Question {index + 1}: Correct answer â€” {item['options'][correct]}")
                 if item.get("explanation"):
                     st.caption(item["explanation"])
             total = len(st.session_state.quiz_data)
@@ -2393,7 +2393,7 @@ with quiz_tab:
 with flashcards_tab:
     st.markdown("""<div class="premium-card"><div class="section-kicker">ACTIVE RECALL</div><div class="section-title">AI Flashcards</div><div class="section-copy">Build quick revision cards from the most important document concepts.</div></div>""", unsafe_allow_html=True)
     flashcard_count = st.slider("Number of flashcards", 6, 20, 12, disabled=not documents_are_ready, key="flashcard_count")
-    if st.button("🃏 Generate flashcards", use_container_width=True, disabled=not documents_are_ready, key="generate_flashcards_button"):
+    if st.button("ðŸƒ Generate flashcards", use_container_width=True, disabled=not documents_are_ready, key="generate_flashcards_button"):
         try:
             with st.spinner("Creating revision flashcards..."):
                 st.session_state.flashcards = generate_flashcards(build_complete_document_text(), flashcard_count)
@@ -2412,7 +2412,7 @@ with flashcards_tab:
 # ------------------------------------------------------------
 with questions_tab:
     st.markdown("""<div class="premium-card"><div class="section-kicker">EXAM PREPARATION</div><div class="section-title">Important Questions Generator</div><div class="section-copy">Create 2-mark, 5-mark, 10-mark, and viva questions from your PDFs.</div></div>""", unsafe_allow_html=True)
-    if st.button("❓ Generate important questions", use_container_width=True, disabled=not documents_are_ready, key="generate_important_questions_button"):
+    if st.button("â“ Generate important questions", use_container_width=True, disabled=not documents_are_ready, key="generate_important_questions_button"):
         try:
             with st.spinner("Preparing exam and viva questions..."):
                 st.session_state.important_questions = generate_important_questions(build_complete_document_text())
@@ -2420,7 +2420,7 @@ with questions_tab:
             st.error(format_user_friendly_error(error))
     if st.session_state.important_questions:
         st.markdown(st.session_state.important_questions)
-        st.download_button("📥 Download questions as text", st.session_state.important_questions, "NeuraDocs_Important_Questions.txt", "text/plain", use_container_width=True, key="download_important_questions_button")
+        st.download_button("ðŸ“¥ Download questions as text", st.session_state.important_questions, "NeuraDocs_Important_Questions.txt", "text/plain", use_container_width=True, key="download_important_questions_button")
     elif documents_are_ready:
         st.caption("Generate question sets for exams and viva preparation.")
 
@@ -2430,7 +2430,7 @@ with questions_tab:
 # ------------------------------------------------------------
 with study_mode_tab:
     st.markdown("""<div class="premium-card"><div class="section-kicker">ALL-IN-ONE LEARNING</div><div class="section-title">AI Study Mode</div><div class="section-copy">Generate overview, revision notes, key terms, flashcards, quiz, and viva questions in one request.</div></div>""", unsafe_allow_html=True)
-    if st.button("🎓 Build complete study pack", use_container_width=True, disabled=not documents_are_ready, key="generate_study_pack_button"):
+    if st.button("ðŸŽ“ Build complete study pack", use_container_width=True, disabled=not documents_are_ready, key="generate_study_pack_button"):
         try:
             with st.spinner("Building your complete AI study pack..."):
                 started = time.perf_counter()
@@ -2448,7 +2448,7 @@ with study_mode_tab:
         st.markdown("### Key terms")
         for item in pack.get("key_terms", []):
             if isinstance(item, dict):
-                st.markdown(f"**{item.get('term', 'Term')}** — {item.get('definition', '')}")
+                st.markdown(f"**{item.get('term', 'Term')}** â€” {item.get('definition', '')}")
         st.markdown("### Flashcards")
         for index, card in enumerate(pack.get("flashcards", []), 1):
             if isinstance(card, dict):
@@ -2461,7 +2461,7 @@ with study_mode_tab:
                 options = item.get("options", [])
                 answer_index = item.get("answer_index", 0)
                 for option_index, option in enumerate(options):
-                    st.write(f"{'✅' if option_index == answer_index else '•'} {option}")
+                    st.write(f"{'âœ…' if option_index == answer_index else 'â€¢'} {option}")
                 if item.get("explanation"):
                     st.caption(item["explanation"])
         st.markdown("### Viva questions")
@@ -2499,7 +2499,7 @@ with search_tab:
     )
 
     if st.button(
-        "🔍 Search documents",
+        "ðŸ” Search documents",
         use_container_width=True,
         disabled=not documents_are_ready,
         key="smart_search_button",
@@ -2528,11 +2528,11 @@ with search_tab:
     ):
         details = extract_source_details(result["chunk"])
         pdf_name = details.get("pdf_name", "Unknown PDF")
-        chunk_number = details.get("original_chunk_number", "—")
+        chunk_number = details.get("original_chunk_number", "â€”")
         score = float(result.get("score", 0.0))
 
         with st.expander(
-            f"{result_index}. {pdf_name} · Chunk {chunk_number} · "
+            f"{result_index}. {pdf_name} Â· Chunk {chunk_number} Â· "
             f"Similarity {score * 100:.1f}%"
         ):
             st.code(result["chunk"], language=None)
@@ -2572,7 +2572,7 @@ with tools_tab:
     )
 
     if st.button(
-        f"✨ Generate {selected_tool}",
+        f"âœ¨ Generate {selected_tool}",
         use_container_width=True,
         disabled=not documents_are_ready,
         key="generate_selected_ai_tool",
@@ -2593,7 +2593,7 @@ with tools_tab:
         st.markdown(tool_output)
 
         st.download_button(
-            f"📥 Download {selected_tool}",
+            f"ðŸ“¥ Download {selected_tool}",
             data=tool_output,
             file_name=f"NeuraDocs_{selected_tool.replace(' ', '_')}.txt",
             mime="text/plain",
@@ -2647,7 +2647,7 @@ with bookmarks_tab:
         bookmark_export_text = "\\n\\n".join(bookmark_export_parts)
 
         st.download_button(
-            "📥 Export all bookmarks",
+            "ðŸ“¥ Export all bookmarks",
             data=bookmark_export_text,
             file_name="NeuraDocs_Bookmarks.txt",
             mime="text/plain",
@@ -2704,7 +2704,7 @@ with analytics_tab:
             (
                 f"{st.session_state.last_similarity_average * 100:.1f}%"
                 if st.session_state.last_similarity_average
-                else "—"
+                else "â€”"
             ),
         )
 
@@ -2721,7 +2721,7 @@ st.markdown("---")
 st.markdown(
     """
     <div class="footer-card">
-        © 2026 <b>NeuraDocs</b> · Built with Python, Streamlit,
+        Â© 2026 <b>NeuraDocs</b> Â· Built with Python, Streamlit,
         FAISS, Sentence Transformers and Generative AI
     </div>
     """,
