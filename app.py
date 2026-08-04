@@ -1,4 +1,4 @@
-import json
+﻿import json
 import re
 import time
 
@@ -1306,6 +1306,32 @@ st.markdown(
             width: 100%;
         }}
     }}
+
+
+    /* Fix PDF upload button visibility */
+section[data-testid="stSidebar"] [data-testid="stFileUploader"] button {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 10px !important;
+    opacity: 1 !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stFileUploader"] button,
+section[data-testid="stSidebar"] [data-testid="stFileUploader"] button p,
+section[data-testid="stSidebar"] [data-testid="stFileUploader"] button span,
+section[data-testid="stSidebar"] [data-testid="stFileUploader"] button svg {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    fill: #111827 !important;
+    opacity: 1 !important;
+    font-weight: 700 !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stFileUploader"] button:hover {
+    background: #f3f4f6 !important;
+    border-color: #60a5fa !important;
+}
+
     </style>
     """,
     unsafe_allow_html=True,
