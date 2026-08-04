@@ -6,9 +6,9 @@ from helpers.text_splitter import split_text
 from helpers.vector_store import create_faiss_index, search_similar_chunks
 
 
-# ==================================================
-# Page Configuration
-# ==================================================
+# ============================================================
+# Page configuration
+# ============================================================
 st.set_page_config(
     page_title="NeuraDocs",
     page_icon="🧠",
@@ -17,889 +17,10 @@ st.set_page_config(
 )
 
 
-# ==================================================
-# User Theme Selection
-# ==================================================
-with st.sidebar:
-    st.markdown(
-        """
-        <div class="sidebar-brand">
-            <div class="sidebar-brand-title">🧠 NeuraDocs</div>
-            <div class="sidebar-brand-subtitle">
-                AI PDF Study Assistant • Version 1.0
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        """
-        <div class="appearance-card">
-            <div class="appearance-title">⚙️ Appearance</div>
-            <div class="appearance-subtitle">Choose your preferred theme</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    selected_theme = st.selectbox(
-        "Choose app theme",
-        options=["Light", "Dark"],
-        index=0,
-        key="neuradocs_theme_selector",
-        label_visibility="collapsed",
-        help="Switch between Light and Dark mode.",
-    )
-
-
-# ==================================================
-# Professional UI Theme
-# ==================================================
-st.markdown(
-    """
-    <style>
-    /* Hide only Streamlit menu and footer. Keep header for sidebar control. */
-    #MainMenu, footer {
-        visibility: hidden;
-    }
-
-    header[data-testid="stHeader"] {
-        visibility: visible !important;
-        background: transparent !important;
-    }
-
-    /* App background */
-    .stApp {
-        background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 55%, #f8fafc 100%);
-        color: #0f172a;
-    }
-
-    /* Main container */
-    .block-container {
-        max-width: 1240px;
-        padding-top: 1.5rem;
-        padding-bottom: 3rem;
-    }
-
-    /* Main content text visibility */
-    .block-container,
-    .block-container p,
-    .block-container li,
-    .block-container label,
-    .block-container span,
-    .block-container div {
-        color: #1f2937;
-    }
-
-    .block-container h1,
-    .block-container h2,
-    .block-container h3,
-    .block-container h4 {
-        color: #172554;
-    }
-
-    .block-container strong,
-    .block-container b {
-        color: #0f172a;
-    }
-
-    /* Hero */
-    .hero-card {
-        background: linear-gradient(135deg, #172554 0%, #1d4ed8 55%, #4f46e5 100%);
-        border-radius: 24px;
-        padding: 34px 28px;
-        margin-bottom: 24px;
-        box-shadow: 0 18px 45px rgba(30, 64, 175, 0.24);
-        text-align: center;
-    }
-
-    .hero-title {
-        color: #ffffff !important;
-        font-size: 46px;
-        font-weight: 850;
-        line-height: 1.1;
-        margin-bottom: 10px;
-    }
-
-    .hero-subtitle {
-        color: #dbeafe !important;
-        font-size: 18px;
-        line-height: 1.6;
-        margin-bottom: 12px;
-    }
-
-    .hero-tech {
-        color: #bfdbfe !important;
-        font-size: 14px;
-        font-weight: 650;
-        letter-spacing: 0.2px;
-    }
-
-    /* Welcome / feature card */
-    .welcome-card {
-        background: rgba(255, 255, 255, 0.94);
-        border: 1px solid #dbeafe;
-        border-radius: 18px;
-        padding: 24px;
-        margin: 8px 0 18px 0;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
-    }
-
-    .welcome-card h3,
-    .welcome-card p,
-    .welcome-card li {
-        color: #1f2937 !important;
-    }
-
-    /* Compact appearance selector */
-    .appearance-card {
-        margin: 14px 0 7px 0;
-        padding: 11px 13px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.07);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .appearance-title {
-        color: #f8fafc !important;
-        font-size: 14px;
-        font-weight: 750;
-        line-height: 1.25;
-    }
-
-    .appearance-subtitle {
-        color: #94a3b8 !important;
-        font-size: 11px;
-        margin-top: 3px;
-    }
-
-    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
-        min-height: 42px !important;
-        background: #111827 !important;
-        border: 1px solid #334155 !important;
-        border-radius: 11px !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-baseweb="select"] span,
-    section[data-testid="stSidebar"] div[data-baseweb="select"] svg {
-        color: #f8fafc !important;
-        fill: #f8fafc !important;
-        -webkit-text-fill-color: #f8fafc !important;
-    }
-
-    /* Sidebar */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a 0%, #172033 100%);
-        border-right: 1px solid #273449;
-    }
-
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] div {
-        color: #f8fafc !important;
-    }
-
-    .sidebar-brand {
-        text-align: center;
-        padding: 10px 4px 6px 4px;
-    }
-
-    .sidebar-brand-title {
-        color: #ffffff !important;
-        font-size: 27px;
-        font-weight: 800;
-    }
-
-    .sidebar-brand-subtitle {
-        color: #cbd5e1 !important;
-        font-size: 13px;
-        margin-top: 4px;
-    }
-
-    /* Buttons */
-    .stButton > button {
-        width: 100%;
-        min-height: 48px;
-        border: none;
-        border-radius: 12px;
-        background: linear-gradient(90deg, #2563eb, #4f46e5);
-        color: #ffffff !important;
-        font-size: 15px;
-        font-weight: 700;
-        box-shadow: 0 7px 18px rgba(37, 99, 235, 0.22);
-        transition: all 0.22s ease;
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 11px 24px rgba(37, 99, 235, 0.3);
-    }
-
-    .stButton > button:disabled {
-        background: #94a3b8;
-        color: #e2e8f0 !important;
-        box-shadow: none;
-    }
-
-    .stButton > button p,
-    .stButton > button span,
-    .stDownloadButton > button p,
-    .stDownloadButton > button span {
-        color: #ffffff !important;
-    }
-
-    /* Download buttons */
-    .stDownloadButton > button {
-        width: 100%;
-        min-height: 46px;
-        border: none;
-        border-radius: 12px;
-        background: linear-gradient(90deg, #0f766e, #0891b2);
-        color: #ffffff !important;
-        font-weight: 700;
-        transition: all 0.22s ease;
-    }
-
-    .stDownloadButton > button:hover {
-        transform: translateY(-2px);
-    }
-
-    /* Metrics */
-    div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #dbeafe;
-        border-radius: 16px;
-        padding: 18px;
-        min-height: 122px;
-        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
-        transition: all 0.22s ease;
-    }
-
-    div[data-testid="stMetric"]:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
-    }
-
-    div[data-testid="stMetric"] label {
-        color: #475569 !important;
-        font-weight: 700;
-    }
-
-    div[data-testid="stMetricValue"] {
-        color: #0f172a !important;
-        font-weight: 850;
-    }
-
-    /* Input box */
-    div[data-baseweb="input"] > div {
-        background: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
-        border-radius: 12px !important;
-    }
-
-    div[data-baseweb="input"] input {
-        background: #ffffff !important;
-        color: #111827 !important;
-        caret-color: #2563eb !important;
-        font-size: 16px !important;
-        font-weight: 500 !important;
-    }
-
-    div[data-baseweb="input"] input::placeholder {
-        color: #64748b !important;
-        opacity: 1 !important;
-    }
-
-    div[data-baseweb="input"] > div:focus-within {
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18) !important;
-    }
-
-    /* File uploader */
-    section[data-testid="stFileUploader"] {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 14px;
-        padding: 8px;
-    }
-
-    /* Expanders */
-    details {
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #dbeafe;
-        border-radius: 12px;
-        padding: 4px;
-    }
-
-    details p,
-    details span,
-    details div,
-    details li {
-        color: #1f2937 !important;
-    }
-
-    /* Text area */
-    textarea {
-        color: #111827 !important;
-        background: #ffffff !important;
-    }
-
-    /* Generated Markdown readability */
-    div[data-testid="stMarkdownContainer"] p,
-    div[data-testid="stMarkdownContainer"] li {
-        color: #1f2937;
-        line-height: 1.7;
-    }
-
-    div[data-testid="stMarkdownContainer"] h1,
-    div[data-testid="stMarkdownContainer"] h2,
-    div[data-testid="stMarkdownContainer"] h3,
-    div[data-testid="stMarkdownContainer"] h4 {
-        color: #172554;
-    }
-
-    /* Chat */
-    div[data-testid="stChatMessage"] {
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #dbeafe;
-        border-radius: 16px;
-        padding: 8px;
-        margin-bottom: 12px;
-        box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
-    }
-
-    div[data-testid="stChatMessage"] p,
-    div[data-testid="stChatMessage"] li,
-    div[data-testid="stChatMessage"] span {
-        color: #1f2937 !important;
-    }
-
-    /* Alerts */
-    div[data-testid="stAlert"] {
-        border-radius: 12px;
-    }
-
-    /* Footer */
-    .custom-footer {
-        text-align: center;
-        color: #64748b !important;
-        font-size: 13px;
-        padding: 18px 0 8px 0;
-    }
-
-    .custom-footer b {
-        color: #334155 !important;
-    }
-
-    /* ==================================================
-       FINAL READABILITY FIXES
-       Keep the light theme, but force every main-content text
-       element to use a clearly visible dark colour.
-       ================================================== */
-
-    /* General text inside the main content area */
-    [data-testid="stAppViewContainer"] .main p,
-    [data-testid="stAppViewContainer"] .main li,
-    [data-testid="stAppViewContainer"] .main label,
-    [data-testid="stAppViewContainer"] .main small,
-    [data-testid="stAppViewContainer"] .main code,
-    [data-testid="stAppViewContainer"] .main pre,
-    [data-testid="stAppViewContainer"] .main td,
-    [data-testid="stAppViewContainer"] .main th {
-        color: #111827 !important;
-        opacity: 1 !important;
-    }
-
-    /* Streamlit Markdown generated from summaries, notes and answers */
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"],
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] p,
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] li,
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] span,
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] strong,
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] em {
-        color: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-        opacity: 1 !important;
-    }
-
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h1,
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h2,
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h3,
-    [data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] h4 {
-        color: #172554 !important;
-        -webkit-text-fill-color: #172554 !important;
-        opacity: 1 !important;
-    }
-
-    /* Question input: white field and dark typed text */
-    [data-testid="stAppViewContainer"] .main div[data-baseweb="input"] > div {
-        background-color: #ffffff !important;
-        border: 1px solid #94a3b8 !important;
-    }
-
-    [data-testid="stAppViewContainer"] .main div[data-baseweb="input"] input {
-        background-color: #ffffff !important;
-        color: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-        caret-color: #2563eb !important;
-        opacity: 1 !important;
-    }
-
-    [data-testid="stAppViewContainer"] .main div[data-baseweb="input"] input::placeholder {
-        color: #64748b !important;
-        -webkit-text-fill-color: #64748b !important;
-        opacity: 1 !important;
-    }
-
-    /* Extracted chunk preview / all text areas, including disabled ones */
-    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] textarea,
-    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] textarea:disabled,
-    [data-testid="stAppViewContainer"] .main textarea,
-    [data-testid="stAppViewContainer"] .main textarea:disabled {
-        background-color: #ffffff !important;
-        color: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-        opacity: 1 !important;
-        border-color: #94a3b8 !important;
-    }
-
-    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] label,
-    [data-testid="stAppViewContainer"] .main div[data-testid="stTextArea"] label p {
-        color: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-        opacity: 1 !important;
-    }
-
-    /* Expanders: dark title and dark content */
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] {
-        background-color: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
-    }
-
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary,
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary p,
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary span,
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] summary svg,
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] div,
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] p,
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] span,
-    [data-testid="stAppViewContainer"] .main details[data-testid="stExpander"] li {
-        color: #111827 !important;
-        fill: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-        opacity: 1 !important;
-    }
-
-    /* Alert messages */
-    [data-testid="stAppViewContainer"] .main [data-testid="stAlert"] p,
-    [data-testid="stAppViewContainer"] .main [data-testid="stAlert"] div,
-    [data-testid="stAppViewContainer"] .main [data-testid="stAlert"] span {
-        color: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-        opacity: 1 !important;
-    }
-
-    /* Chat cards */
-    [data-testid="stAppViewContainer"] .main [data-testid="stChatMessage"] p,
-    [data-testid="stAppViewContainer"] .main [data-testid="stChatMessage"] li,
-    [data-testid="stAppViewContainer"] .main [data-testid="stChatMessage"] span {
-        color: #111827 !important;
-        -webkit-text-fill-color: #111827 !important;
-        opacity: 1 !important;
-    }
-
-    /* Metric labels and values */
-    [data-testid="stAppViewContainer"] .main [data-testid="stMetricLabel"] p {
-        color: #475569 !important;
-        -webkit-text-fill-color: #475569 !important;
-        opacity: 1 !important;
-    }
-
-    [data-testid="stAppViewContainer"] .main [data-testid="stMetricValue"] {
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
-        opacity: 1 !important;
-    }
-
-    /* Preserve intentional white text on coloured controls */
-    .hero-card .hero-title,
-    .hero-card .hero-subtitle,
-    .hero-card .hero-tech,
-    .stButton > button,
-    .stButton > button p,
-    .stButton > button span,
-    .stDownloadButton > button,
-    .stDownloadButton > button p,
-    .stDownloadButton > button span {
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .block-container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-            padding-top: 1rem;
-        }
-
-        .hero-card {
-            padding: 26px 18px;
-            border-radius: 18px;
-        }
-
-        .hero-title {
-            font-size: 35px;
-        }
-
-        .hero-subtitle {
-            font-size: 15px;
-        }
-
-        .hero-tech {
-            font-size: 12px;
-        }
-    }
-
-
-    /* Code blocks / architecture diagrams inside generated Markdown */
-    .block-container pre,
-    .block-container pre code,
-    .block-container [data-testid="stCodeBlock"],
-    .block-container [data-testid="stCodeBlock"] code,
-    .block-container [data-testid="stCodeBlock"] span {
-        background: #111827 !important;
-        color: #f8fafc !important;
-        -webkit-text-fill-color: #f8fafc !important;
-        opacity: 1 !important;
-    }
-
-    .block-container pre {
-        border: 1px solid #334155 !important;
-        border-radius: 14px !important;
-        padding: 18px !important;
-        overflow-x: auto !important;
-        line-height: 1.65 !important;
-    }
-
-    .block-container code:not(pre code) {
-        background: #e2e8f0 !important;
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
-        border-radius: 6px !important;
-        padding: 2px 6px !important;
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# ==================================================
-# Dynamic Theme Overrides
-# ==================================================
-if selected_theme == "Dark":
-    theme_values = {
-        "app_bg": "linear-gradient(135deg, #070b14 0%, #0f172a 55%, #111827 100%)",
-        "main_text": "#e5e7eb",
-        "muted_text": "#cbd5e1",
-        "heading": "#f8fafc",
-        "card_bg": "#111827",
-        "card_border": "#334155",
-        "input_bg": "#0f172a",
-        "input_text": "#f8fafc",
-        "code_bg": "#020617",
-        "code_text": "#f8fafc",
-        "alert_text": "#f8fafc",
-        "divider": "#334155",
-    }
-else:
-    theme_values = {
-        "app_bg": "linear-gradient(135deg, #f8fafc 0%, #eef2ff 55%, #f8fafc 100%)",
-        "main_text": "#111827",
-        "muted_text": "#475569",
-        "heading": "#172554",
-        "card_bg": "#ffffff",
-        "card_border": "#dbeafe",
-        "input_bg": "#ffffff",
-        "input_text": "#111827",
-        "code_bg": "#111827",
-        "code_text": "#f8fafc",
-        "alert_text": "#111827",
-        "divider": "#cbd5e1",
-    }
-
-st.markdown(
-    f"""
-    <style>
-    /* Theme Manager overrides */
-    html, body, .stApp,
-    [data-testid="stAppViewContainer"],
-    [data-testid="stMain"],
-    .main {{
-        background: {theme_values['app_bg']} !important;
-        color: {theme_values['main_text']} !important;
-    }}
-
-    header[data-testid="stHeader"] {{
-        visibility: visible !important;
-        background: transparent !important;
-    }}
-
-    [data-testid="stSidebarCollapsedControl"],
-    [data-testid="collapsedControl"] {{
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        z-index: 999999 !important;
-    }}
-
-    /* Main text */
-    [data-testid="stAppViewContainer"] .main p,
-    [data-testid="stAppViewContainer"] .main li,
-    [data-testid="stAppViewContainer"] .main label,
-    [data-testid="stAppViewContainer"] .main span,
-    [data-testid="stAppViewContainer"] .main small,
-    [data-testid="stAppViewContainer"] .main div[data-testid="stMarkdownContainer"] {{
-        color: {theme_values['main_text']} !important;
-        -webkit-text-fill-color: {theme_values['main_text']} !important;
-        opacity: 1 !important;
-    }}
-
-    [data-testid="stAppViewContainer"] .main h1,
-    [data-testid="stAppViewContainer"] .main h2,
-    [data-testid="stAppViewContainer"] .main h3,
-    [data-testid="stAppViewContainer"] .main h4 {{
-        color: {theme_values['heading']} !important;
-        -webkit-text-fill-color: {theme_values['heading']} !important;
-    }}
-
-    /* Cards, metrics, expanders and chat */
-    .welcome-card,
-    div[data-testid="stMetric"],
-    details[data-testid="stExpander"],
-    div[data-testid="stChatMessage"] {{
-        background: {theme_values['card_bg']} !important;
-        border-color: {theme_values['card_border']} !important;
-    }}
-
-    .welcome-card h3,
-    .welcome-card p,
-    .welcome-card li,
-    div[data-testid="stMetric"] label,
-    div[data-testid="stMetricValue"],
-    details[data-testid="stExpander"] summary,
-    details[data-testid="stExpander"] summary *,
-    details[data-testid="stExpander"] div,
-    details[data-testid="stExpander"] p,
-    details[data-testid="stExpander"] span,
-    details[data-testid="stExpander"] li,
-    div[data-testid="stChatMessage"] p,
-    div[data-testid="stChatMessage"] span,
-    div[data-testid="stChatMessage"] li {{
-        color: {theme_values['main_text']} !important;
-        -webkit-text-fill-color: {theme_values['main_text']} !important;
-        opacity: 1 !important;
-    }}
-
-    /* Inputs and text areas */
-    div[data-baseweb="input"] > div,
-    div[data-baseweb="input"] input,
-    div[data-testid="stTextArea"] textarea,
-    div[data-testid="stTextArea"] textarea:disabled {{
-        background: {theme_values['input_bg']} !important;
-        color: {theme_values['input_text']} !important;
-        -webkit-text-fill-color: {theme_values['input_text']} !important;
-        opacity: 1 !important;
-        border-color: {theme_values['card_border']} !important;
-    }}
-
-    div[data-baseweb="input"] input::placeholder {{
-        color: {theme_values['muted_text']} !important;
-        -webkit-text-fill-color: {theme_values['muted_text']} !important;
-        opacity: 1 !important;
-    }}
-
-    /* Alerts */
-    div[data-testid="stAlert"] p,
-    div[data-testid="stAlert"] span,
-    div[data-testid="stAlert"] div {{
-        color: {theme_values['alert_text']} !important;
-        -webkit-text-fill-color: {theme_values['alert_text']} !important;
-    }}
-
-    /* Code / architecture blocks */
-    .block-container pre,
-    .block-container pre code,
-    .block-container [data-testid="stCodeBlock"],
-    .block-container [data-testid="stCodeBlock"] code,
-    .block-container [data-testid="stCodeBlock"] span {{
-        background: {theme_values['code_bg']} !important;
-        color: {theme_values['code_text']} !important;
-        -webkit-text-fill-color: {theme_values['code_text']} !important;
-    }}
-
-    [data-testid="stAppViewContainer"] hr {{
-        border-color: {theme_values['divider']} !important;
-    }}
-
-    /* File uploader readability in the dark sidebar */
-    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] {{
-        background: #0b1220 !important;
-        border: 1px solid #334155 !important;
-    }}
-
-    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] button {{
-        background: #f8fafc !important;
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
-        border: 1px solid #cbd5e1 !important;
-    }}
-
-    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] button * {{
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
-    }}
-
-    /* Preserve white text on hero and coloured buttons */
-    .hero-card .hero-title,
-    .hero-card .hero-subtitle,
-    .hero-card .hero-tech,
-    .stButton > button,
-    .stButton > button *,
-    .stDownloadButton > button,
-    .stDownloadButton > button * {{
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-    }}
-
-    /* ==================================================
-       FINAL THEME FIXES
-       ================================================== */
-
-    /* Keep the sidebar consistently dark in both themes */
-    section[data-testid="stSidebar"] {{
-        background: linear-gradient(180deg, #0f172a 0%, #172033 100%) !important;
-        border-right: 1px solid #273449 !important;
-    }}
-
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] small,
-    section[data-testid="stSidebar"] div {{
-        color: #f8fafc !important;
-        -webkit-text-fill-color: #f8fafc !important;
-        opacity: 1 !important;
-    }}
-
-    section[data-testid="stSidebar"] [data-testid="stAlert"] {{
-        background: #1e3a5f !important;
-        border: 1px solid #2b4f7c !important;
-    }}
-
-    section[data-testid="stSidebar"] [data-testid="stAlert"] * {{
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-    }}
-
-    /* Main headings and captions follow the selected theme */
-    [data-testid="stAppViewContainer"] .main h1,
-    [data-testid="stAppViewContainer"] .main h2,
-    [data-testid="stAppViewContainer"] .main h3,
-    [data-testid="stAppViewContainer"] .main h4,
-    [data-testid="stAppViewContainer"] .main h5,
-    [data-testid="stAppViewContainer"] .main h6,
-    [data-testid="stAppViewContainer"] .main h1 *,
-    [data-testid="stAppViewContainer"] .main h2 *,
-    [data-testid="stAppViewContainer"] .main h3 *,
-    [data-testid="stAppViewContainer"] .main h4 *,
-    [data-testid="stAppViewContainer"] .main h5 *,
-    [data-testid="stAppViewContainer"] .main h6 * {{
-        color: {theme_values['heading']} !important;
-        -webkit-text-fill-color: {theme_values['heading']} !important;
-        opacity: 1 !important;
-    }}
-
-    [data-testid="stAppViewContainer"] .main [data-testid="stCaptionContainer"],
-    [data-testid="stAppViewContainer"] .main [data-testid="stCaptionContainer"] *,
-    [data-testid="stAppViewContainer"] .main .stCaptionContainer,
-    [data-testid="stAppViewContainer"] .main .stCaptionContainer * {{
-        color: {theme_values['muted_text']} !important;
-        -webkit-text-fill-color: {theme_values['muted_text']} !important;
-        opacity: 1 !important;
-    }}
-
-    /* Streamlit top toolbar/share/GitHub icons */
-    header[data-testid="stHeader"] {{
-        background: transparent !important;
-    }}
-
-    [data-testid="stToolbar"],
-    [data-testid="stToolbar"] *,
-    [data-testid="stAppDeployButton"],
-    [data-testid="stAppDeployButton"] *,
-    [data-testid="stDecoration"],
-    header[data-testid="stHeader"] button,
-    header[data-testid="stHeader"] button *,
-    header[data-testid="stHeader"] a,
-    header[data-testid="stHeader"] a * {{
-        color: {theme_values['heading']} !important;
-        -webkit-text-fill-color: {theme_values['heading']} !important;
-        fill: {theme_values['heading']} !important;
-        stroke: {theme_values['heading']} !important;
-        opacity: 1 !important;
-    }}
-
-    /* Sidebar collapse and reopen buttons */
-    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"],
-    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"] *,
-    section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"],
-    section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] * {{
-        color: #ffffff !important;
-        fill: #ffffff !important;
-        stroke: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-    }}
-
-    [data-testid="stSidebarCollapsedControl"],
-    [data-testid="collapsedControl"],
-    [data-testid="stSidebarCollapsedControl"] *,
-    [data-testid="collapsedControl"] * {{
-        color: {theme_values['heading']} !important;
-        fill: {theme_values['heading']} !important;
-        stroke: {theme_values['heading']} !important;
-        -webkit-text-fill-color: {theme_values['heading']} !important;
-        opacity: 1 !important;
-    }}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# ==================================================
-# Session State Initialization
-# ==================================================
-def clone_default(value):
-    """Return a fresh copy for mutable default values."""
-    if isinstance(value, list):
-        return list(value)
-    if isinstance(value, dict):
-        return dict(value)
-    return value
-
-
-default_session_values = {
+# ============================================================
+# Session state
+# ============================================================
+DEFAULT_STATE = {
     "all_chunks": [],
     "faiss_index": None,
     "processed_file_signature": [],
@@ -909,16 +30,22 @@ default_session_values = {
     "questions_asked": 0,
 }
 
-for key, default_value in default_session_values.items():
-    if key not in st.session_state:
-        st.session_state[key] = clone_default(default_value)
+
+def clone_default(value):
+    if isinstance(value, list):
+        return list(value)
+    if isinstance(value, dict):
+        return dict(value)
+    return value
 
 
-# ==================================================
-# Utility Functions
-# ==================================================
+for state_key, default_value in DEFAULT_STATE.items():
+    if state_key not in st.session_state:
+        st.session_state[state_key] = clone_default(default_value)
+
+
 def clear_application_data() -> None:
-    """Clear processed documents and generated content."""
+    """Clear all document-related state."""
     st.session_state.all_chunks = []
     st.session_state.faiss_index = None
     st.session_state.processed_file_signature = []
@@ -927,91 +54,720 @@ def clear_application_data() -> None:
     st.session_state.study_notes = ""
     st.session_state.questions_asked = 0
 
-    # Clear the question input when the widget already exists.
     if "pdf_question_input" in st.session_state:
         st.session_state.pdf_question_input = ""
 
 
+def build_complete_document_text() -> str:
+    """Combine all stored chunks into a single document string."""
+    return "\n\n".join(st.session_state.all_chunks)
+
+
 def format_user_friendly_error(error: Exception) -> str:
-    """Convert common technical errors into concise user-facing messages."""
+    """Convert technical exceptions into concise user-friendly messages."""
     error_text = str(error)
     error_lower = error_text.lower()
 
-    if "429" in error_text or "resource_exhausted" in error_lower or "quota" in error_lower:
+    if (
+        "429" in error_text
+        or "resource_exhausted" in error_lower
+        or "quota" in error_lower
+        or "rate limit" in error_lower
+    ):
         return (
-            "Gemini API quota has been reached. Please try again after the quota "
-            "resets or use a project with available quota."
+            "The current AI provider quota has been reached. "
+            "Please try again later or verify that the fallback provider is configured."
         )
 
-    if "api key" in error_lower or "google_api_key" in error_lower:
+    if (
+        "api key" in error_lower
+        or "google_api_key" in error_lower
+        or "groq_api_key" in error_lower
+        or "unauthenticated" in error_lower
+    ):
         return (
-            "The Gemini API key is missing or invalid. Please verify the "
-            "GOOGLE_API_KEY configuration."
+            "An AI API key is missing or invalid. "
+            "Please verify the Streamlit Secrets configuration."
         )
 
-    if "503" in error_text or "unavailable" in error_lower or "high demand" in error_lower:
+    if (
+        "503" in error_text
+        or "unavailable" in error_lower
+        or "high demand" in error_lower
+        or "timeout" in error_lower
+    ):
         return (
-            "Gemini is temporarily unavailable because of high demand. "
+            "The AI service is temporarily unavailable. "
             "Please wait briefly and try again."
         )
 
     if "huggingface" in error_lower or "couldn't connect" in error_lower:
         return (
-            "The embedding model could not be downloaded. Please check the "
-            "deployment connection and model configuration."
+            "The embedding model could not be loaded. "
+            "Please check the deployment connection and model configuration."
+        )
+
+    if "reportlab" in error_lower:
+        return (
+            "PDF export is unavailable because ReportLab is not installed correctly."
         )
 
     return f"An unexpected error occurred: {error_text}"
 
 
-def build_complete_document_text() -> str:
-    """Combine all stored chunks into one document string."""
-    return "\n\n".join(st.session_state.all_chunks)
-
-
-# ==================================================
-# Sidebar
-# ==================================================
+# ============================================================
+# Sidebar controls
+# ============================================================
 with st.sidebar:
-    st.markdown("---")
+    st.markdown(
+        """
+        <div class="side-brand">
+            <div class="side-logo">🧠</div>
+            <div>
+                <div class="side-title">NeuraDocs</div>
+                <div class="side-subtitle">AI PDF Study Assistant</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    selected_theme = st.selectbox(
+        "Appearance",
+        options=["Light", "Dark"],
+        index=0,
+        key="neuradocs_theme_selector",
+        help="Switch between Light and Dark mode.",
+    )
+
+    st.markdown(
+        '<div class="side-label">DOCUMENTS</div>',
+        unsafe_allow_html=True,
+    )
 
     uploaded_files = st.file_uploader(
-        label="📂 Upload PDF Files",
+        "Upload PDF files",
         type=["pdf"],
         accept_multiple_files=True,
         help="Upload one or more text-based PDF files.",
+        label_visibility="collapsed",
     )
 
-    st.markdown("---")
-
-    st.info(
-        "Upload PDFs to ask questions, create summaries, generate study "
-        "notes, and download the results."
+    st.caption(
+        "Text-based PDFs work best. Scanned PDFs will require OCR support."
     )
 
     if st.button(
-        "🗑️ Clear Processed Data",
+        "🗑️ Clear workspace",
         use_container_width=True,
-        key="clear_processed_data_button",
+        key="clear_workspace_button",
     ):
         clear_application_data()
-        st.success("Processed data cleared successfully.")
+        st.success("Workspace cleared.")
         st.rerun()
 
+    st.markdown("---")
+    st.markdown(
+        """
+        <div class="side-mini-card">
+            <div class="side-mini-title">Quick guide</div>
+            <div class="side-mini-text">
+                1. Upload PDFs<br>
+                2. Wait for indexing<br>
+                3. Generate notes or ask questions
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-# ==================================================
-# Hero Section
-# ==================================================
+
+# ============================================================
+# Theme values
+# ============================================================
+if selected_theme == "Dark":
+    theme = {
+        "page_bg": "#070b14",
+        "page_bg_2": "#0f172a",
+        "surface": "#111827",
+        "surface_2": "#172033",
+        "border": "#2b3a55",
+        "text": "#f8fafc",
+        "muted": "#a8b3c7",
+        "heading": "#ffffff",
+        "input": "#0b1220",
+        "shadow": "rgba(0, 0, 0, 0.35)",
+        "soft_blue": "rgba(59, 130, 246, 0.12)",
+    }
+else:
+    theme = {
+        "page_bg": "#f6f8fc",
+        "page_bg_2": "#eef2ff",
+        "surface": "#ffffff",
+        "surface_2": "#f8fafc",
+        "border": "#dbe4f0",
+        "text": "#172033",
+        "muted": "#64748b",
+        "heading": "#0f172a",
+        "input": "#ffffff",
+        "shadow": "rgba(15, 23, 42, 0.09)",
+        "soft_blue": "rgba(37, 99, 235, 0.08)",
+    }
+
+
+# ============================================================
+# Premium UI CSS
+# ============================================================
+st.markdown(
+    f"""
+    <style>
+    #MainMenu, footer {{
+        visibility: hidden;
+    }}
+
+    header[data-testid="stHeader"] {{
+        background: transparent !important;
+    }}
+
+    html, body, .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"] {{
+        background:
+            radial-gradient(circle at 10% 0%, {theme['soft_blue']} 0%, transparent 32%),
+            linear-gradient(135deg, {theme['page_bg']} 0%, {theme['page_bg_2']} 100%) !important;
+        color: {theme['text']} !important;
+    }}
+
+    .block-container {{
+        max-width: 1280px;
+        padding-top: 1.25rem;
+        padding-bottom: 3rem;
+    }}
+
+    /* Typography */
+    [data-testid="stAppViewContainer"] .main p,
+    [data-testid="stAppViewContainer"] .main li,
+    [data-testid="stAppViewContainer"] .main label,
+    [data-testid="stAppViewContainer"] .main span,
+    [data-testid="stAppViewContainer"] .main small {{
+        color: {theme['text']} !important;
+        -webkit-text-fill-color: {theme['text']} !important;
+    }}
+
+    [data-testid="stAppViewContainer"] .main h1,
+    [data-testid="stAppViewContainer"] .main h2,
+    [data-testid="stAppViewContainer"] .main h3,
+    [data-testid="stAppViewContainer"] .main h4 {{
+        color: {theme['heading']} !important;
+        -webkit-text-fill-color: {theme['heading']} !important;
+        letter-spacing: -0.02em;
+    }}
+
+    [data-testid="stCaptionContainer"],
+    [data-testid="stCaptionContainer"] * {{
+        color: {theme['muted']} !important;
+        -webkit-text-fill-color: {theme['muted']} !important;
+    }}
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {{
+        background:
+            radial-gradient(circle at 20% 0%, rgba(79, 70, 229, 0.28), transparent 32%),
+            linear-gradient(180deg, #08111f 0%, #0f172a 100%) !important;
+        border-right: 1px solid #243149 !important;
+    }}
+
+    section[data-testid="stSidebar"] * {{
+        color: #f8fafc !important;
+        -webkit-text-fill-color: #f8fafc !important;
+    }}
+
+    .side-brand {{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 2px 18px 2px;
+    }}
+
+    .side-logo {{
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32);
+    }}
+
+    .side-title {{
+        color: #ffffff !important;
+        font-size: 23px;
+        font-weight: 850;
+        line-height: 1.1;
+    }}
+
+    .side-subtitle {{
+        color: #aebbd0 !important;
+        font-size: 12px;
+        margin-top: 4px;
+    }}
+
+    .side-label {{
+        color: #8090aa !important;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        margin: 18px 0 8px 2px;
+    }}
+
+    .side-mini-card {{
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }}
+
+    .side-mini-title {{
+        color: #ffffff !important;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 7px;
+    }}
+
+    .side-mini-text {{
+        color: #b7c2d4 !important;
+        font-size: 12px;
+        line-height: 1.7;
+    }}
+
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {{
+        background: #111b2d !important;
+        border: 1px solid #33425d !important;
+        border-radius: 11px !important;
+        min-height: 42px;
+    }}
+
+    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] {{
+        background: rgba(255, 255, 255, 0.045) !important;
+        border: 1px dashed #43516a !important;
+        border-radius: 16px !important;
+        padding: 6px !important;
+    }}
+
+    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] button {{
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: 750 !important;
+    }}
+
+    section[data-testid="stSidebar"] section[data-testid="stFileUploader"] button * {{
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+    }}
+
+    section[data-testid="stSidebar"] [data-testid="stAlert"] {{
+        background: rgba(37, 99, 235, 0.16) !important;
+        border: 1px solid rgba(96, 165, 250, 0.25) !important;
+    }}
+
+    /* Hero */
+    .hero-shell {{
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        padding: 36px 34px;
+        margin-bottom: 22px;
+        background:
+            radial-gradient(circle at 82% 20%, rgba(255,255,255,0.18), transparent 24%),
+            linear-gradient(135deg, #172554 0%, #1d4ed8 48%, #6d28d9 100%);
+        box-shadow: 0 24px 55px rgba(30, 64, 175, 0.28);
+    }}
+
+    .hero-shell::after {{
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -90px;
+        bottom: -140px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.09);
+    }}
+
+    .hero-badge {{
+        display: inline-block;
+        padding: 7px 12px;
+        margin-bottom: 14px;
+        border-radius: 999px;
+        color: #dbeafe !important;
+        background: rgba(255,255,255,0.11);
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: 12px;
+        font-weight: 750;
+        letter-spacing: 0.04em;
+    }}
+
+    .hero-title {{
+        color: #ffffff !important;
+        font-size: 49px;
+        font-weight: 900;
+        letter-spacing: -0.045em;
+        line-height: 1.04;
+    }}
+
+    .hero-copy {{
+        max-width: 720px;
+        color: #dbeafe !important;
+        font-size: 17px;
+        line-height: 1.7;
+        margin-top: 12px;
+    }}
+
+    .hero-pills {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 22px;
+    }}
+
+    .hero-pill {{
+        color: #ffffff !important;
+        padding: 8px 11px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.13);
+        font-size: 12px;
+        font-weight: 700;
+    }}
+
+    /* Reusable cards */
+    .premium-card {{
+        background: {theme['surface']} !important;
+        border: 1px solid {theme['border']} !important;
+        border-radius: 20px;
+        padding: 22px;
+        box-shadow: 0 12px 30px {theme['shadow']};
+        margin-bottom: 14px;
+    }}
+
+    .section-kicker {{
+        color: #2563eb !important;
+        font-size: 11px;
+        font-weight: 850;
+        letter-spacing: 0.14em;
+        margin-bottom: 6px;
+    }}
+
+    .section-title {{
+        color: {theme['heading']} !important;
+        font-size: 25px;
+        font-weight: 850;
+        letter-spacing: -0.025em;
+    }}
+
+    .section-copy {{
+        color: {theme['muted']} !important;
+        font-size: 14px;
+        line-height: 1.65;
+        margin-top: 5px;
+    }}
+
+    .empty-grid {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-top: 18px;
+    }}
+
+    .feature-chip {{
+        background: {theme['surface_2']} !important;
+        border: 1px solid {theme['border']} !important;
+        border-radius: 14px;
+        padding: 16px 13px;
+        color: {theme['text']} !important;
+        font-weight: 750;
+        text-align: center;
+        font-size: 13px;
+    }}
+
+    /* Metrics */
+    div[data-testid="stMetric"] {{
+        background: {theme['surface']} !important;
+        border: 1px solid {theme['border']} !important;
+        border-radius: 18px;
+        padding: 17px 18px;
+        min-height: 116px;
+        box-shadow: 0 10px 25px {theme['shadow']};
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }}
+
+    div[data-testid="stMetric"]:hover {{
+        transform: translateY(-3px);
+        box-shadow: 0 15px 34px {theme['shadow']};
+    }}
+
+    div[data-testid="stMetricLabel"] p {{
+        color: {theme['muted']} !important;
+        -webkit-text-fill-color: {theme['muted']} !important;
+        font-weight: 700 !important;
+    }}
+
+    div[data-testid="stMetricValue"] {{
+        color: {theme['heading']} !important;
+        -webkit-text-fill-color: {theme['heading']} !important;
+        font-weight: 900 !important;
+    }}
+
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 8px;
+        background: {theme['surface']} !important;
+        border: 1px solid {theme['border']} !important;
+        border-radius: 15px;
+        padding: 6px;
+        box-shadow: 0 8px 22px {theme['shadow']};
+    }}
+
+    .stTabs [data-baseweb="tab"] {{
+        height: 45px;
+        border-radius: 10px;
+        color: {theme['muted']} !important;
+        font-weight: 750;
+        padding: 0 16px;
+    }}
+
+    .stTabs [aria-selected="true"] {{
+        background: linear-gradient(90deg, #2563eb, #4f46e5) !important;
+        color: #ffffff !important;
+    }}
+
+    .stTabs [aria-selected="true"] * {{
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }}
+
+    /* Buttons */
+    .stButton > button {{
+        width: 100%;
+        min-height: 47px;
+        border: none !important;
+        border-radius: 12px !important;
+        background: linear-gradient(90deg, #2563eb, #4f46e5) !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }}
+
+    .stButton > button:hover {{
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(37, 99, 235, 0.3);
+    }}
+
+    .stButton > button:disabled {{
+        background: #8b98aa !important;
+        opacity: 0.65 !important;
+        box-shadow: none !important;
+    }}
+
+    .stButton > button *,
+    .stDownloadButton > button * {{
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }}
+
+    .stDownloadButton > button {{
+        width: 100%;
+        min-height: 45px;
+        border: none !important;
+        border-radius: 12px !important;
+        background: linear-gradient(90deg, #059669, #0891b2) !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+    }}
+
+    /* Inputs */
+    div[data-baseweb="input"] > div,
+    div[data-baseweb="textarea"] > div {{
+        background: {theme['input']} !important;
+        border: 1px solid {theme['border']} !important;
+        border-radius: 13px !important;
+    }}
+
+    div[data-baseweb="input"] input,
+    textarea,
+    textarea:disabled {{
+        background: {theme['input']} !important;
+        color: {theme['text']} !important;
+        -webkit-text-fill-color: {theme['text']} !important;
+        opacity: 1 !important;
+    }}
+
+    div[data-baseweb="input"] input::placeholder {{
+        color: {theme['muted']} !important;
+        -webkit-text-fill-color: {theme['muted']} !important;
+        opacity: 1 !important;
+    }}
+
+    div[data-baseweb="input"] > div:focus-within {{
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }}
+
+    /* Expanders */
+    details[data-testid="stExpander"] {{
+        background: {theme['surface']} !important;
+        border: 1px solid {theme['border']} !important;
+        border-radius: 15px !important;
+        overflow: hidden;
+    }}
+
+    details[data-testid="stExpander"] summary,
+    details[data-testid="stExpander"] summary *,
+    details[data-testid="stExpander"] p,
+    details[data-testid="stExpander"] span,
+    details[data-testid="stExpander"] li {{
+        color: {theme['text']} !important;
+        -webkit-text-fill-color: {theme['text']} !important;
+    }}
+
+    /* Alerts */
+    [data-testid="stAlert"] {{
+        border-radius: 14px !important;
+    }}
+
+    [data-testid="stAlert"] * {{
+        color: {theme['text']} !important;
+        -webkit-text-fill-color: {theme['text']} !important;
+    }}
+
+    /* Markdown output */
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] span,
+    [data-testid="stMarkdownContainer"] strong,
+    [data-testid="stMarkdownContainer"] em {{
+        color: {theme['text']} !important;
+        -webkit-text-fill-color: {theme['text']} !important;
+        line-height: 1.72;
+    }}
+
+    [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stMarkdownContainer"] h3,
+    [data-testid="stMarkdownContainer"] h4 {{
+        color: {theme['heading']} !important;
+        -webkit-text-fill-color: {theme['heading']} !important;
+    }}
+
+    /* Chat */
+    [data-testid="stChatMessage"] {{
+        background: {theme['surface']} !important;
+        border: 1px solid {theme['border']} !important;
+        border-radius: 17px !important;
+        padding: 8px !important;
+        box-shadow: 0 8px 22px {theme['shadow']};
+        margin-bottom: 11px;
+    }}
+
+    /* Code blocks */
+    .block-container pre,
+    .block-container pre code,
+    [data-testid="stCodeBlock"],
+    [data-testid="stCodeBlock"] code,
+    [data-testid="stCodeBlock"] span {{
+        background: #08111f !important;
+        color: #f8fafc !important;
+        -webkit-text-fill-color: #f8fafc !important;
+    }}
+
+    .block-container pre {{
+        border: 1px solid #2b3a55 !important;
+        border-radius: 14px !important;
+        padding: 18px !important;
+        overflow-x: auto !important;
+    }}
+
+    hr {{
+        border-color: {theme['border']} !important;
+    }}
+
+    .footer-card {{
+        text-align: center;
+        padding: 20px 8px 4px 8px;
+        color: {theme['muted']} !important;
+        font-size: 12px;
+    }}
+
+    .footer-card b {{
+        color: {theme['heading']} !important;
+    }}
+
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="collapsedControl"] {{
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 99999 !important;
+    }}
+
+    [data-testid="stSidebarCollapsedControl"] *,
+    [data-testid="collapsedControl"] * {{
+        color: {theme['heading']} !important;
+        fill: {theme['heading']} !important;
+        stroke: {theme['heading']} !important;
+    }}
+
+    @media (max-width: 820px) {{
+        .block-container {{
+            padding-left: 0.9rem;
+            padding-right: 0.9rem;
+        }}
+
+        .hero-shell {{
+            padding: 28px 20px;
+            border-radius: 21px;
+        }}
+
+        .hero-title {{
+            font-size: 37px;
+        }}
+
+        .hero-copy {{
+            font-size: 15px;
+        }}
+
+        .empty-grid {{
+            grid-template-columns: repeat(2, 1fr);
+        }}
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ============================================================
+# Hero
+# ============================================================
 st.markdown(
     """
-    <div class="hero-card">
-        <div class="hero-title">🧠 NeuraDocs</div>
-        <div class="hero-subtitle">
-            AI-powered PDF question answering, intelligent summarization,
-            and structured study notes in one place.
+    <div class="hero-shell">
+        <div class="hero-badge">AI-POWERED DOCUMENT INTELLIGENCE</div>
+        <div class="hero-title">Turn PDFs into answers.</div>
+        <div class="hero-copy">
+            Ask questions, create structured notes, generate summaries,
+            and discover the most relevant information from your documents.
         </div>
-        <div class="hero-tech">
-            Powered by Gemini AI • FAISS • RAG • Sentence Transformers
+        <div class="hero-pills">
+            <div class="hero-pill">⚡ Semantic Search</div>
+            <div class="hero-pill">🧠 RAG Pipeline</div>
+            <div class="hero-pill">📚 Study Notes</div>
+            <div class="hero-pill">📄 PDF Export</div>
         </div>
     </div>
     """,
@@ -1019,9 +775,9 @@ st.markdown(
 )
 
 
-# ==================================================
-# PDF Processing
-# ==================================================
+# ============================================================
+# PDF processing
+# ============================================================
 if uploaded_files:
     current_file_signature = [
         (uploaded_file.name, uploaded_file.size)
@@ -1035,7 +791,7 @@ if uploaded_files:
 
     if files_have_changed:
         with st.spinner(
-            "📄 NeuraDocs is reading your PDFs and building the search index..."
+            "Reading your PDFs and creating the semantic search index..."
         ):
             collected_chunks = []
 
@@ -1046,7 +802,7 @@ if uploaded_files:
                     if not pdf_text or not pdf_text.strip():
                         st.warning(
                             f"No readable text was found in {pdf_file.name}. "
-                            "The PDF may be scanned or image-based."
+                            "The file may be scanned or image-based."
                         )
                         continue
 
@@ -1054,11 +810,14 @@ if uploaded_files:
 
                     if not pdf_chunks:
                         st.warning(
-                            f"No text chunks could be created from {pdf_file.name}."
+                            f"No usable text chunks could be created from {pdf_file.name}."
                         )
                         continue
 
-                    for chunk_number, chunk in enumerate(pdf_chunks, start=1):
+                    for chunk_number, chunk in enumerate(
+                        pdf_chunks,
+                        start=1,
+                    ):
                         formatted_chunk = (
                             f"Source PDF: {pdf_file.name}\n"
                             f"Chunk Number: {chunk_number}\n\n"
@@ -1076,14 +835,18 @@ if uploaded_files:
                 try:
                     from helpers.embedding_model import create_embeddings
 
-                    document_embeddings = create_embeddings(collected_chunks)
-                    vector_index = create_faiss_index(document_embeddings)
+                    document_embeddings = create_embeddings(
+                        collected_chunks
+                    )
+                    vector_index = create_faiss_index(
+                        document_embeddings
+                    )
 
                     st.session_state.all_chunks = collected_chunks
                     st.session_state.faiss_index = vector_index
-                    st.session_state.processed_file_signature = current_file_signature
-
-                    # Clear outputs generated for previous files.
+                    st.session_state.processed_file_signature = (
+                        current_file_signature
+                    )
                     st.session_state.chat_history = []
                     st.session_state.pdf_summary = ""
                     st.session_state.study_notes = ""
@@ -1095,9 +858,9 @@ if uploaded_files:
                 clear_application_data()
 
 
-# ==================================================
-# Document Ready Check
-# ==================================================
+# ============================================================
+# Derived document state
+# ============================================================
 documents_are_ready = (
     bool(st.session_state.all_chunks)
     and st.session_state.faiss_index is not None
@@ -1112,308 +875,406 @@ embedding_count = (
 )
 
 
-# ==================================================
-# Empty State
-# ==================================================
+# ============================================================
+# Empty state / status
+# ============================================================
 if not documents_are_ready:
     st.markdown(
         """
-        <div class="welcome-card">
-            <h3>👋 Welcome to NeuraDocs</h3>
-            <p>Upload one or more PDF files from the sidebar to begin.</p>
-            <ul>
-                <li>Ask questions directly from your PDFs</li>
-                <li>Generate detailed document summaries</li>
-                <li>Create structured study notes</li>
-                <li>Download generated content as PDF</li>
-            </ul>
+        <div class="premium-card">
+            <div class="section-kicker">GET STARTED</div>
+            <div class="section-title">Your document workspace is ready.</div>
+            <div class="section-copy">
+                Upload one or more PDFs from the sidebar. NeuraDocs will extract,
+                index, and prepare them for intelligent search.
+            </div>
+            <div class="empty-grid">
+                <div class="feature-chip">💬 Ask Questions</div>
+                <div class="feature-chip">📝 Build Summaries</div>
+                <div class="feature-chip">📚 Create Notes</div>
+                <div class="feature-chip">📥 Export Results</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.success(
+        "Documents indexed successfully — your AI workspace is ready."
+    )
+
+
+# ============================================================
+# Dashboard
+# ============================================================
+metric_col_1, metric_col_2, metric_col_3, metric_col_4 = st.columns(4)
+
+with metric_col_1:
+    st.metric("PDFs", pdf_count)
+
+with metric_col_2:
+    st.metric("Chunks", chunk_count)
+
+with metric_col_3:
+    st.metric("Embeddings", embedding_count)
+
+with metric_col_4:
+    st.metric("Questions", st.session_state.questions_asked)
+
+
+# ============================================================
+# Main workspace tabs
+# ============================================================
+overview_tab, summary_tab, notes_tab, ask_tab = st.tabs(
+    [
+        "📁 Overview",
+        "📝 Summary",
+        "📚 Study Notes",
+        "💬 Ask AI",
+    ]
+)
+
+
+# ------------------------------------------------------------
+# Overview tab
+# ------------------------------------------------------------
+with overview_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">WORKSPACE</div>
+            <div class="section-title">Document overview</div>
+            <div class="section-copy">
+                Review the uploaded files and inspect the indexed content.
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    if documents_are_ready:
+        left_column, right_column = st.columns([1, 1.35])
 
-# ==================================================
-# Dashboard
-# ==================================================
-st.subheader("📊 Dashboard")
+        with left_column:
+            st.markdown("#### Uploaded files")
+            for pdf_file in uploaded_files or []:
+                st.write(f"📄 {pdf_file.name}")
 
-metric_col_1, metric_col_2, metric_col_3, metric_col_4 = st.columns(4)
+        with right_column:
+            with st.expander(
+                "Preview first extracted chunk",
+                expanded=True,
+            ):
+                st.text_area(
+                    label="Indexed text preview",
+                    value=st.session_state.all_chunks[0],
+                    height=245,
+                    disabled=True,
+                    key="first_extracted_chunk_viewer",
+                )
+    else:
+        st.info("Upload PDFs to populate the workspace.")
 
-with metric_col_1:
-    st.metric("📄 PDFs", pdf_count)
 
-with metric_col_2:
-    st.metric("🧩 Chunks", chunk_count)
-
-with metric_col_3:
-    st.metric("🧠 Embeddings", embedding_count)
-
-with metric_col_4:
-    st.metric("💬 Questions", st.session_state.questions_asked)
-
-
-# ==================================================
-# Processed Document Information
-# ==================================================
-if documents_are_ready:
-    st.success(
-        "✅ Your documents are ready. You can now ask questions, "
-        "generate a summary, or create study notes."
+# ------------------------------------------------------------
+# Summary tab
+# ------------------------------------------------------------
+with summary_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">DOCUMENT INTELLIGENCE</div>
+            <div class="section-title">Generate a polished summary</div>
+            <div class="section-copy">
+                Create a structured overview with key concepts and revision points.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    st.subheader("📁 Uploaded Files")
-
-    for pdf_file in uploaded_files or []:
-        st.write(f"📄 {pdf_file.name}")
-
-    with st.expander("🔎 View First Extracted Chunk"):
-        st.text_area(
-            label="First Chunk",
-            value=st.session_state.all_chunks[0],
-            height=220,
-            disabled=True,
-            key="first_extracted_chunk_viewer",
-        )
-
-
-# ==================================================
-# PDF Summary Generator
-# ==================================================
-st.markdown("---")
-st.subheader("📝 PDF Summary")
-
-if st.button(
-    "📄 Generate Summary",
-    use_container_width=True,
-    disabled=not documents_are_ready,
-    key="generate_pdf_summary_button",
-):
-    try:
-        with st.spinner("🧠 NeuraDocs is preparing a detailed summary..."):
-            from helpers.summary_generator import generate_pdf_summary
-
-            generated_summary = generate_pdf_summary(
-                build_complete_document_text()
-            )
-            st.session_state.pdf_summary = generated_summary
-
-    except Exception as error:
-        st.error(format_user_friendly_error(error))
-
-if st.session_state.pdf_summary:
-    st.markdown("### 📄 Generated Summary")
-    st.markdown(st.session_state.pdf_summary)
-
-    try:
-        from helpers.pdf_exporter import create_pdf
-
-        summary_pdf = create_pdf(
-            "NeuraDocs - PDF Summary",
-            st.session_state.pdf_summary,
-        )
-
-        st.download_button(
-            label="📥 Download Summary as PDF",
-            data=summary_pdf,
-            file_name="NeuraDocs_PDF_Summary.pdf",
-            mime="application/pdf",
-            use_container_width=True,
-            key="download_summary_pdf_button",
-        )
-    except Exception as error:
-        st.warning(
-            "The summary was generated, but the PDF download could not be "
-            f"prepared: {error}"
-        )
-
-
-# ==================================================
-# Study Notes Generator
-# ==================================================
-st.markdown("---")
-st.subheader("📚 AI Study Notes")
-
-if st.button(
-    "📚 Generate Study Notes",
-    use_container_width=True,
-    disabled=not documents_are_ready,
-    key="generate_study_notes_button",
-):
-    try:
-        with st.spinner("🧠 NeuraDocs is creating structured study notes..."):
-            from helpers.notes_generator import generate_study_notes
-
-            generated_notes = generate_study_notes(
-                build_complete_document_text()
-            )
-            st.session_state.study_notes = generated_notes
-
-    except Exception as error:
-        st.error(format_user_friendly_error(error))
-
-if st.session_state.study_notes:
-    st.markdown("### 📝 Generated Study Notes")
-    st.markdown(st.session_state.study_notes)
-
-    try:
-        from helpers.pdf_exporter import create_pdf
-
-        notes_pdf = create_pdf(
-            "NeuraDocs - Study Notes",
-            st.session_state.study_notes,
-        )
-
-        st.download_button(
-            label="📥 Download Study Notes as PDF",
-            data=notes_pdf,
-            file_name="NeuraDocs_Study_Notes.pdf",
-            mime="application/pdf",
-            use_container_width=True,
-            key="download_study_notes_pdf_button",
-        )
-    except Exception as error:
-        st.warning(
-            "The study notes were generated, but the PDF download could not "
-            f"be prepared: {error}"
-        )
-
-
-# ==================================================
-# Question Answering Section
-# ==================================================
-st.markdown("---")
-st.subheader("💬 Ask a Question From Your PDFs")
-
-st.caption(
-    "Type your question below. NeuraDocs retrieves the most relevant "
-    "content from your uploaded PDFs before generating the answer."
-)
-
-question = st.text_input(
-    label="Enter your question",
-    placeholder="Example: What is the main concept explained in this PDF?",
-    disabled=not documents_are_ready,
-    key="pdf_question_input",
-)
-
-if st.button(
-    "🚀 Ask NeuraDocs",
-    type="primary",
-    use_container_width=True,
-    disabled=not documents_are_ready,
-    key="ask_neuradocs_button",
-):
-    if not question or not question.strip():
-        st.warning("Please enter a question before asking NeuraDocs.")
-    else:
+    if st.button(
+        "✨ Generate document summary",
+        use_container_width=True,
+        disabled=not documents_are_ready,
+        key="generate_pdf_summary_button",
+    ):
         try:
-            with st.spinner("🧠 NeuraDocs is analyzing the relevant content..."):
-                from helpers.embedding_model import create_query_embedding
-                from helpers.qa_chain import get_answer
+            with st.spinner(
+                "Preparing a detailed summary from your documents..."
+            ):
+                from helpers.summary_generator import generate_pdf_summary
 
-                question_embedding = create_query_embedding(question)
-
-                retrieval_results = search_similar_chunks(
-                    question_embedding=question_embedding,
-                    index=st.session_state.faiss_index,
-                    chunks=st.session_state.all_chunks,
-                    top_k=5,
+                generated_summary = generate_pdf_summary(
+                    build_complete_document_text()
                 )
-
-                if not retrieval_results:
-                    st.warning(
-                        "No sufficiently relevant content was found for this question."
-                    )
-                else:
-                    retrieved_context = "\n\n".join(
-                        result["chunk"] for result in retrieval_results
-                    )
-
-                    generated_answer = get_answer(
-                        question=question,
-                        context=retrieved_context,
-                    )
-
-                    st.session_state.questions_asked += 1
-                    st.session_state.chat_history.append(
-                        {
-                            "question": question,
-                            "answer": generated_answer,
-                            "sources": retrieval_results,
-                        }
-                    )
-                    st.rerun()
+                st.session_state.pdf_summary = generated_summary
 
         except Exception as error:
             st.error(format_user_friendly_error(error))
 
+    if st.session_state.pdf_summary:
+        st.markdown("### Generated summary")
+        st.markdown(st.session_state.pdf_summary)
 
-# ==================================================
-# ChatGPT-Style Conversation
-# ==================================================
-if st.session_state.chat_history:
-    st.markdown("---")
+        try:
+            from helpers.pdf_exporter import create_pdf
 
-    heading_column, clear_chat_column = st.columns([4, 1])
+            summary_pdf = create_pdf(
+                "NeuraDocs - PDF Summary",
+                st.session_state.pdf_summary,
+            )
 
-    with heading_column:
-        st.subheader("💬 NeuraDocs Conversation")
+            st.download_button(
+                label="📥 Download summary as PDF",
+                data=summary_pdf,
+                file_name="NeuraDocs_PDF_Summary.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+                key="download_summary_pdf_button",
+            )
 
-    with clear_chat_column:
-        if st.button(
-            "🗑️ Clear Chat",
+        except Exception as error:
+            st.warning(
+                "The summary was generated, but the PDF download "
+                f"could not be prepared: {error}"
+            )
+    elif documents_are_ready:
+        st.caption(
+            "Generate a summary to view and download it here."
+        )
+
+
+# ------------------------------------------------------------
+# Study notes tab
+# ------------------------------------------------------------
+with notes_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">STUDY MODE</div>
+            <div class="section-title">Create structured study notes</div>
+            <div class="section-copy">
+                Convert the uploaded material into organized, exam-friendly notes.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button(
+        "📚 Generate study notes",
+        use_container_width=True,
+        disabled=not documents_are_ready,
+        key="generate_study_notes_button",
+    ):
+        try:
+            with st.spinner(
+                "Organizing your documents into structured study notes..."
+            ):
+                from helpers.notes_generator import generate_study_notes
+
+                generated_notes = generate_study_notes(
+                    build_complete_document_text()
+                )
+                st.session_state.study_notes = generated_notes
+
+        except Exception as error:
+            st.error(format_user_friendly_error(error))
+
+    if st.session_state.study_notes:
+        st.markdown("### Generated study notes")
+        st.markdown(st.session_state.study_notes)
+
+        try:
+            from helpers.pdf_exporter import create_pdf
+
+            notes_pdf = create_pdf(
+                "NeuraDocs - Study Notes",
+                st.session_state.study_notes,
+            )
+
+            st.download_button(
+                label="📥 Download study notes as PDF",
+                data=notes_pdf,
+                file_name="NeuraDocs_Study_Notes.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+                key="download_study_notes_pdf_button",
+            )
+
+        except Exception as error:
+            st.warning(
+                "The notes were generated, but the PDF download "
+                f"could not be prepared: {error}"
+            )
+    elif documents_are_ready:
+        st.caption(
+            "Generate study notes to view and download them here."
+        )
+
+
+# ------------------------------------------------------------
+# Ask AI tab
+# ------------------------------------------------------------
+with ask_tab:
+    st.markdown(
+        """
+        <div class="premium-card">
+            <div class="section-kicker">CONVERSATIONAL SEARCH</div>
+            <div class="section-title">Ask anything from your PDFs</div>
+            <div class="section-copy">
+                NeuraDocs retrieves the most relevant chunks before generating
+                a context-aware answer.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    with st.form(
+        "ask_neuradocs_form",
+        clear_on_submit=False,
+    ):
+        question = st.text_input(
+            label="Your question",
+            placeholder="Example: Explain the main concept discussed in the document.",
+            disabled=not documents_are_ready,
+            key="pdf_question_input",
+        )
+
+        ask_submitted = st.form_submit_button(
+            "🚀 Ask NeuraDocs",
+            type="primary",
             use_container_width=True,
-            key="clear_chat_button",
-        ):
-            st.session_state.chat_history = []
-            st.rerun()
+            disabled=not documents_are_ready,
+        )
 
-    for chat in st.session_state.chat_history:
-        with st.chat_message("user"):
-            st.markdown(chat["question"])
+    if ask_submitted:
+        if not question or not question.strip():
+            st.warning("Please enter a question.")
+        else:
+            try:
+                with st.spinner(
+                    "Retrieving relevant context and generating the answer..."
+                ):
+                    from helpers.embedding_model import create_query_embedding
+                    from helpers.qa_chain import get_answer
 
-        with st.chat_message("assistant"):
-            st.markdown(chat["answer"])
+                    question_embedding = create_query_embedding(question)
 
-            if chat.get("sources"):
-                with st.expander("📚 Sources Used"):
-                    for source_number, source in enumerate(
-                        chat["sources"],
-                        start=1,
-                    ):
-                        source_details = extract_source_details(source["chunk"])
+                    retrieval_results = search_similar_chunks(
+                        question_embedding=question_embedding,
+                        index=st.session_state.faiss_index,
+                        chunks=st.session_state.all_chunks,
+                        top_k=5,
+                    )
 
-                        pdf_name = source_details.get("pdf_name", "Unknown PDF")
-                        chunk_number = source_details.get(
-                            "original_chunk_number"
+                    if not retrieval_results:
+                        st.warning(
+                            "No sufficiently relevant content was found."
                         )
-                        similarity_score = source.get("score", 0.0)
-
-                        st.markdown(f"#### Source {source_number}")
-                        st.write(f"**PDF:** {pdf_name}")
-
-                        if chunk_number is not None:
-                            st.write(f"**Chunk:** {chunk_number}")
-
-                        st.write(
-                            f"**Similarity Score:** {similarity_score:.3f}"
+                    else:
+                        retrieved_context = "\n\n".join(
+                            result["chunk"]
+                            for result in retrieval_results
                         )
 
-                        if source_number < len(chat["sources"]):
-                            st.markdown("---")
+                        generated_answer = get_answer(
+                            question=question,
+                            context=retrieved_context,
+                        )
+
+                        st.session_state.questions_asked += 1
+                        st.session_state.chat_history.append(
+                            {
+                                "question": question,
+                                "answer": generated_answer,
+                                "sources": retrieval_results,
+                            }
+                        )
+                        st.rerun()
+
+            except Exception as error:
+                st.error(format_user_friendly_error(error))
+
+    if st.session_state.chat_history:
+        chat_heading, chat_clear = st.columns([5, 1])
+
+        with chat_heading:
+            st.markdown("### Conversation")
+
+        with chat_clear:
+            if st.button(
+                "Clear chat",
+                use_container_width=True,
+                key="clear_chat_button",
+            ):
+                st.session_state.chat_history = []
+                st.rerun()
+
+        for chat in st.session_state.chat_history:
+            with st.chat_message("user"):
+                st.markdown(chat["question"])
+
+            with st.chat_message("assistant"):
+                st.markdown(chat["answer"])
+
+                if chat.get("sources"):
+                    with st.expander("Sources used"):
+                        for source_number, source in enumerate(
+                            chat["sources"],
+                            start=1,
+                        ):
+                            source_details = extract_source_details(
+                                source["chunk"]
+                            )
+                            pdf_name = source_details.get(
+                                "pdf_name",
+                                "Unknown PDF",
+                            )
+                            chunk_number = source_details.get(
+                                "original_chunk_number"
+                            )
+                            similarity_score = source.get(
+                                "score",
+                                0.0,
+                            )
+
+                            st.markdown(
+                                f"**Source {source_number}**"
+                            )
+                            st.write(f"PDF: {pdf_name}")
+
+                            if chunk_number is not None:
+                                st.write(
+                                    f"Chunk: {chunk_number}"
+                                )
+
+                            st.write(
+                                f"Similarity score: "
+                                f"{similarity_score:.3f}"
+                            )
+
+                            if source_number < len(
+                                chat["sources"]
+                            ):
+                                st.markdown("---")
+    elif documents_are_ready:
+        st.caption(
+            "Your answers and source citations will appear here."
+        )
 
 
-# ==================================================
+# ============================================================
 # Footer
-# ==================================================
+# ============================================================
 st.markdown("---")
 st.markdown(
     """
-    <div class="custom-footer">
-        © 2026 <b>NeuraDocs</b><br>
-        Built with <b>Python</b> • <b>Streamlit</b> •
-        <b>FAISS</b> • <b>Gemini AI</b>
+    <div class="footer-card">
+        © 2026 <b>NeuraDocs</b> · Built with Python, Streamlit,
+        FAISS, Sentence Transformers and Generative AI
     </div>
     """,
     unsafe_allow_html=True,
