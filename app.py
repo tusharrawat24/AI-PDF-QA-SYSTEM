@@ -960,6 +960,352 @@ st.markdown(
             grid-template-columns: repeat(2, 1fr);
         }}
     }}
+
+    /* ULTRA PREMIUM VISUAL LAYER */
+    .stApp::before,
+    .stApp::after {{
+        content: "";
+        position: fixed;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        filter: blur(95px);
+        opacity: 0.18;
+        pointer-events: none;
+        z-index: 0;
+        animation: floatGlow 12s ease-in-out infinite alternate;
+    }}
+
+    .stApp::before {{
+        top: -130px;
+        left: -130px;
+        background: #3b82f6;
+    }}
+
+    .stApp::after {{
+        right: -150px;
+        bottom: -150px;
+        background: #8b5cf6;
+        animation-delay: 2s;
+    }}
+
+    @keyframes floatGlow {{
+        from {{ transform: translate3d(0, 0, 0) scale(1); }}
+        to {{ transform: translate3d(35px, 24px, 0) scale(1.08); }}
+    }}
+
+    .block-container {{
+        position: relative;
+        z-index: 1;
+    }}
+
+    .hero-shell {{
+        padding: 0 !important;
+        border: 1px solid rgba(255,255,255,0.14);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        box-shadow: 0 28px 70px rgba(30,64,175,0.28), inset 0 1px 0 rgba(255,255,255,0.18);
+    }}
+
+    .hero-grid {{
+        display: grid;
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 24px;
+        align-items: center;
+        padding: 40px;
+        min-height: 360px;
+    }}
+
+    .hero-left {{
+        position: relative;
+        z-index: 2;
+    }}
+
+    .hero-right {{
+        position: relative;
+        min-height: 280px;
+        display: grid;
+        place-items: center;
+    }}
+
+    .hero-highlight {{
+        background: linear-gradient(90deg, #ffffff 0%, #bfdbfe 35%, #ddd6fe 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        -webkit-text-fill-color: transparent !important;
+    }}
+
+    .hero-ai-card {{
+        position: relative;
+        z-index: 2;
+        width: min(100%, 330px);
+        padding: 20px;
+        border-radius: 22px;
+        background: rgba(9,18,37,0.58);
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 0 20px 50px rgba(2,6,23,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        animation: cardFloat 5.5s ease-in-out infinite;
+    }}
+
+    @keyframes cardFloat {{
+        0%, 100% {{ transform: translateY(0); }}
+        50% {{ transform: translateY(-8px); }}
+    }}
+
+    .hero-ai-top {{
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }}
+
+    .hero-ai-dot {{
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #34d399;
+        box-shadow: 0 0 18px #34d399;
+    }}
+
+    .hero-ai-label {{
+        color: #c7d2fe !important;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+    }}
+
+    .hero-ai-line {{
+        height: 1px;
+        margin: 15px 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+    }}
+
+    .hero-ai-stat {{
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 11px 0;
+    }}
+
+    .hero-ai-stat span {{
+        color: #93c5fd !important;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }}
+
+    .hero-ai-stat b {{
+        color: #ffffff !important;
+        font-size: 14px;
+    }}
+
+    .orb {{
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(2px);
+    }}
+
+    .orb-one {{
+        width: 170px;
+        height: 170px;
+        top: 5px;
+        right: 10px;
+        background: radial-gradient(circle, rgba(96,165,250,0.45), transparent 70%);
+        animation: orbitOne 7s ease-in-out infinite alternate;
+    }}
+
+    .orb-two {{
+        width: 130px;
+        height: 130px;
+        left: 0;
+        bottom: 0;
+        background: radial-gradient(circle, rgba(167,139,250,0.42), transparent 70%);
+        animation: orbitTwo 8s ease-in-out infinite alternate;
+    }}
+
+    @keyframes orbitOne {{
+        from {{ transform: translate(0, 0) scale(1); }}
+        to {{ transform: translate(-18px, 18px) scale(1.08); }}
+    }}
+
+    @keyframes orbitTwo {{
+        from {{ transform: translate(0, 0) scale(1); }}
+        to {{ transform: translate(20px, -10px) scale(1.12); }}
+    }}
+
+    .top-feature-strip {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin: 16px 0 22px;
+    }}
+
+    .top-feature-item {{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: {theme['surface']} !important;
+        border: 1px solid {theme['border']} !important;
+        box-shadow: 0 10px 26px {theme['shadow']};
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }}
+
+    .top-feature-item:hover {{
+        transform: translateY(-3px);
+        border-color: #60a5fa !important;
+    }}
+
+    .top-feature-icon {{
+        font-size: 22px;
+    }}
+
+    .top-feature-item b {{
+        display: block;
+        color: {theme['heading']} !important;
+        font-size: 13px;
+    }}
+
+    .top-feature-item small {{
+        color: {theme['muted']} !important;
+        font-size: 11px;
+    }}
+
+    .premium-card,
+    div[data-testid="stMetric"],
+    details[data-testid="stExpander"],
+    [data-testid="stChatMessage"] {{
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        animation: fadeUp 0.45s ease both;
+    }}
+
+    .premium-card {{
+        position: relative;
+        overflow: hidden;
+    }}
+
+    .premium-card::before {{
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(180deg, #2563eb, #7c3aed);
+    }}
+
+    div[data-testid="stMetric"] {{
+        overflow: hidden;
+        position: relative;
+    }}
+
+    div[data-testid="stMetric"]::after {{
+        content: "";
+        position: absolute;
+        width: 95px;
+        height: 95px;
+        right: -38px;
+        top: -38px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(59,130,246,0.16), transparent 70%);
+    }}
+
+    .stTabs [data-baseweb="tab-list"] {{
+        position: sticky;
+        top: 0.55rem;
+        z-index: 20;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        overflow-x: auto;
+        scrollbar-width: none;
+    }}
+
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {{
+        display: none;
+    }}
+
+    .stTabs [data-baseweb="tab"] {{
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }}
+
+    .stTabs [data-baseweb="tab"]:hover {{
+        background: rgba(59,130,246,0.08);
+    }}
+
+    section[data-testid="stSidebar"] {{
+        box-shadow: 18px 0 45px rgba(2,6,23,0.22);
+    }}
+
+    .side-brand {{
+        padding: 10px 0 22px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }}
+
+    .stButton > button,
+    .stDownloadButton > button {{
+        position: relative;
+        overflow: hidden;
+    }}
+
+    .stButton > button::after,
+    .stDownloadButton > button::after {{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -110%;
+        width: 55%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.55s ease;
+    }}
+
+    .stButton > button:hover::after,
+    .stDownloadButton > button:hover::after {{
+        left: 140%;
+    }}
+
+    @keyframes fadeUp {{
+        from {{ opacity: 0; transform: translateY(10px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
+
+    [data-testid="stChatMessage"] {{
+        border-radius: 20px !important;
+        padding: 10px 12px !important;
+    }}
+
+    @media (max-width: 900px) {{
+        .hero-grid {{
+            grid-template-columns: 1fr;
+            padding: 28px 22px;
+        }}
+
+        .hero-right {{
+            min-height: 220px;
+        }}
+
+        .top-feature-strip {{
+            grid-template-columns: repeat(2, 1fr);
+        }}
+    }}
+
+    @media (max-width: 560px) {{
+        .hero-title {{
+            font-size: 34px;
+        }}
+
+        .top-feature-strip {{
+            grid-template-columns: 1fr;
+        }}
+
+        .hero-ai-card {{
+            width: 100%;
+        }}
+    }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -972,17 +1318,72 @@ st.markdown(
 st.markdown(
     """
     <div class="hero-shell">
-        <div class="hero-badge">AI-POWERED DOCUMENT INTELLIGENCE</div>
-        <div class="hero-title">Turn PDFs into answers.</div>
-        <div class="hero-copy">
-            Ask questions, create structured notes, generate summaries,
-            and discover the most relevant information from your documents.
+        <div class="hero-grid">
+            <div class="hero-left">
+                <div class="hero-badge">NEXT-GEN AI PDF WORKSPACE</div>
+                <div class="hero-title">
+                    Understand documents.<br>
+                    <span class="hero-highlight">Study smarter.</span>
+                </div>
+                <div class="hero-copy">
+                    Turn complex PDFs into answers, notes, quizzes, flashcards,
+                    mind maps, and revision packs — all from one intelligent workspace.
+                </div>
+                <div class="hero-pills">
+                    <div class="hero-pill">⚡ Semantic Search</div>
+                    <div class="hero-pill">🧠 RAG Intelligence</div>
+                    <div class="hero-pill">🎓 Study Mode</div>
+                    <div class="hero-pill">📄 Smart Export</div>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="orb orb-one"></div>
+                <div class="orb orb-two"></div>
+                <div class="hero-ai-card">
+                    <div class="hero-ai-top">
+                        <span class="hero-ai-dot"></span>
+                        <span class="hero-ai-label">AI WORKSPACE ACTIVE</span>
+                    </div>
+                    <div class="hero-ai-line"></div>
+                    <div class="hero-ai-stat">
+                        <span>Documents</span>
+                        <b>Ready to analyze</b>
+                    </div>
+                    <div class="hero-ai-stat">
+                        <span>Retrieval</span>
+                        <b>Semantic + Contextual</b>
+                    </div>
+                    <div class="hero-ai-stat">
+                        <span>Outputs</span>
+                        <b>Answers · Notes · Quiz</b>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="hero-pills">
-            <div class="hero-pill">⚡ Semantic Search</div>
-            <div class="hero-pill">🧠 RAG Pipeline</div>
-            <div class="hero-pill">📚 Study Notes</div>
-            <div class="hero-pill">📄 PDF Export</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+st.markdown(
+    """
+    <div class="top-feature-strip">
+        <div class="top-feature-item">
+            <span class="top-feature-icon">📂</span>
+            <div><b>Upload</b><small>Multiple PDFs</small></div>
+        </div>
+        <div class="top-feature-item">
+            <span class="top-feature-icon">🧩</span>
+            <div><b>Understand</b><small>Embeddings + FAISS</small></div>
+        </div>
+        <div class="top-feature-item">
+            <span class="top-feature-icon">💬</span>
+            <div><b>Interact</b><small>Context-aware answers</small></div>
+        </div>
+        <div class="top-feature-item">
+            <span class="top-feature-icon">🎓</span>
+            <div><b>Learn</b><small>Notes, quiz, flashcards</small></div>
         </div>
     </div>
     """,
